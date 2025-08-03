@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "app/api/analyze/route.ts": {
+      "runtime": "edge"
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+} 

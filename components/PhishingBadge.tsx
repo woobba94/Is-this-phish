@@ -53,8 +53,8 @@ export default function PhishingBadge({ score, className = '' }: PhishingBadgePr
   const IconComponent = config.icon
 
   return (
-    <div className={`flex flex-col items-center gap-2 ${className}`}>
-      <Badge variant={config.variant} className="text-lg px-6 py-3 gap-2">
+    <div className="flex flex-col items-center gap-2">
+      <Badge variant={config.variant} className={`text-lg px-6 py-3 gap-2 ${className}`}>
         <IconComponent className="w-5 h-5" />
         <span className="font-bold text-xl">{score}</span>
         <span className="font-semibold">{config.label}</span>

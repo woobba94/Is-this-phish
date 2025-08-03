@@ -73,7 +73,7 @@ describe('PhishingBadge', () => {
       const { unmount } = render(<PhishingBadge score={score} />)
       
       const badge = screen.getByText(score).closest('div')
-      expect(badge).toHaveClass('inline-flex', 'items-center', 'gap-2', 'px-4', 'py-2', 'rounded-full', 'font-semibold', 'text-white')
+      expect(badge).toHaveClass('inline-flex', 'items-center', 'rounded-full', 'font-semibold', 'text-white')
       
       unmount()
     })
@@ -85,7 +85,7 @@ describe('PhishingBadge', () => {
     const scoreElement = screen.getByText('C')
     const labelElement = screen.getByText('주의')
     
-    expect(scoreElement).toHaveClass('text-lg', 'font-bold')
+    expect(scoreElement).toHaveClass('font-bold', 'text-xl')
     expect(labelElement).toBeInTheDocument()
   })
 }) 

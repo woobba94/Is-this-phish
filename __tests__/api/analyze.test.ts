@@ -1,16 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/analyze/route'
 
+// Global storage for mock function
+declare global {
+  var __openaiMockCreate: any
+}
+
 // OpenAI mock
-vi.mock('openai', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: vi.fn()
+vi.mock('openai', () => {
+  const mockCreateFn = vi.fn()
+  globalThis.__openaiMockCreate = mockCreateFn
+  
+  return {
+    default: class MockOpenAI {
+      chat = {
+        completions: {
+          create: mockCreateFn
+        }
       }
     }
-  }))
-}))
+  }
+})
 
 // Rate limit mock
 vi.mock('@/utils/rateLimit', () => ({
@@ -25,9 +35,12 @@ vi.mock('@/utils/staticRules', () => ({
 }))
 
 describe('/api/analyze', () => {
+  let mockCreate: any
+
   beforeEach(() => {
     vi.resetAllMocks()
     process.env.OPENAI_API_KEY = 'test-api-key'
+    mockCreate = globalThis.__openaiMockCreate
   })
 
   it('성공적인 분석 요청을 처리해야 함', async () => {
@@ -56,9 +69,7 @@ describe('/api/analyze', () => {
     ;(getPhishingScore as any).mockReturnValue('F')
 
     // OpenAI mock
-    const OpenAI = (await import('openai')).default
-    const mockOpenAI = new OpenAI()
-    ;(mockOpenAI.chat.completions.create as any).mockResolvedValue({
+    mockCreate.mockResolvedValue({
       choices: [{
         message: {
           function_call: {
@@ -190,9 +201,7 @@ describe('/api/analyze', () => {
     ;(getPhishingScore as any).mockReturnValue('F')
 
     // OpenAI mock - 에러 발생
-    const OpenAI = (await import('openai')).default
-    const mockOpenAI = new OpenAI()
-    ;(mockOpenAI.chat.completions.create as any).mockRejectedValue(new Error('OpenAI API Error'))
+    mockCreate.mockRejectedValue(new Error('OpenAI API Error'))
 
     const response = await POST(mockRequest)
     const data = await response.json()
@@ -230,9 +239,7 @@ describe('/api/analyze', () => {
     ;(getPhishingScore as any).mockReturnValue('C')
 
     // OpenAI mock
-    const OpenAI = (await import('openai')).default
-    const mockOpenAI = new OpenAI()
-    ;(mockOpenAI.chat.completions.create as any).mockResolvedValue({
+    mockCreate.mockResolvedValue({
       choices: [{
         message: {
           function_call: {
@@ -283,10 +290,7 @@ describe('/api/analyze', () => {
     ;(getPhishingScore as any).mockReturnValue('F')
 
     // OpenAI mock
-    const OpenAI = (await import('openai')).default
-    const mockOpenAI = new OpenAI()
-    const createSpy = vi.spyOn(mockOpenAI.chat.completions, 'create')
-    createSpy.mockResolvedValue({
+    mockCreate.mockResolvedValue({
       choices: [{
         message: {
           function_call: {
@@ -302,7 +306,7 @@ describe('/api/analyze', () => {
 
     await POST(mockRequest)
 
-    expect(createSpy).toHaveBeenCalledWith({
+    expect(mockCreate).toHaveBeenCalledWith({
       model: 'gpt-4o',
       temperature: 0,
       messages: expect.arrayContaining([
