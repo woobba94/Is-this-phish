@@ -16,19 +16,16 @@ function isDeveloperMode(): boolean {
     return true
   }
   
-  // 2. Vercel 프리뷰 배포인 경우 (dev 브랜치 등)
-  if (process.env.VERCEL_ENV === 'preview') {
-    return true
-  }
+
   
-  // 3. 개발용 환경변수가 설정된 경우
+  // 2. 개발용 환경변수가 설정된 경우
   if (process.env.ALLOW_DEV_MODE === 'true') {
     return true
   }
   
-  // 4. 로컬 호스트명이나 개발 URL 패턴인 경우
+  // 3. 로컬 호스트명인 경우
   const vercelUrl = process.env.VERCEL_URL
-  if (vercelUrl && (vercelUrl.includes('localhost') || vercelUrl.includes('-dev-') || vercelUrl.includes('.vercel.app'))) {
+  if (vercelUrl && vercelUrl.includes('localhost')) {
     return true
   }
   
