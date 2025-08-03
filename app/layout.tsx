@@ -76,7 +76,7 @@ export default function RootLayout({
                 <ul className="text-muted-foreground text-sm space-y-2">
                   <li>• 61% increase in phishing reports in Korea in 2024</li>
                   <li>• Real-time AI analysis with results in 3 seconds</li>
-                  <li>• Free daily analysis per IP address</li>
+                  <li>• Up to 10 free analyses per IP address daily</li>
                   <li>• Powered by OpenAI GPT-4o analysis engine</li>
                 </ul>
               </section>

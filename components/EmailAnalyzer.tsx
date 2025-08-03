@@ -229,9 +229,9 @@ export default function EmailAnalyzer() {
               <AlertTitle id="important-notes">Important Notes</AlertTitle>
               <AlertDescription className="space-y-1 mt-2">
                 <ul className="list-disc list-inside space-y-1">
-                  <li>One analysis per IP address per day</li>
-                  <li>Please be careful when entering content with personal information</li>
-                  <li>Analysis results are for reference only, final judgment should be made by the user</li>
+                  <li>10 analyses per IP address per day</li>
+                  <li>Please be careful when entering content containing personal information</li>
+                  <li>Analysis results are for reference only, final decisions are the user&apos;s responsibility</li>
                 </ul>
               </AlertDescription>
             </Alert>
