@@ -25,7 +25,7 @@ export const RISK_LEVELS = {
   Critical: {
     label: 'Critical',
     variant: 'phishingA' as const,
-    description: 'Confirmed phishing detected',
+    description: 'Confirmed phishing threats detected',
     badgeClass: 'bg-red-500 text-white text-lg px-4 py-2 font-bold',
     borderColor: 'border-red-500',
     bgColor: 'bg-red-50/50',
@@ -35,7 +35,7 @@ export const RISK_LEVELS = {
   High: {
     label: 'High',
     variant: 'phishingB' as const,
-    description: 'High phishing possibility',
+    description: 'High probability of phishing detected',
     badgeClass: 'bg-orange-500 text-white text-lg px-4 py-2 font-bold',
     borderColor: 'border-orange-500',
     bgColor: 'bg-orange-50/50',
@@ -45,7 +45,7 @@ export const RISK_LEVELS = {
   Medium: {
     label: 'Medium',
     variant: 'phishingC' as const,
-    description: 'Some risk factors present',
+    description: 'Some suspicious patterns identified',
     badgeClass: 'bg-yellow-500 text-white text-lg px-4 py-2 font-bold',
     borderColor: 'border-yellow-500',
     bgColor: 'bg-yellow-50/50',
@@ -55,7 +55,7 @@ export const RISK_LEVELS = {
   Low: {
     label: 'Low',
     variant: 'phishingD' as const,
-    description: 'Minor concerns',
+    description: 'Minor security concerns detected',
     badgeClass: 'bg-blue-500 text-white text-lg px-4 py-2 font-bold',
     borderColor: 'border-blue-500',
     bgColor: 'bg-blue-50/50',
@@ -65,7 +65,7 @@ export const RISK_LEVELS = {
   Safe: {
     label: 'Safe',
     variant: 'phishingF' as const,
-    description: 'Normal email/URL',
+    description: 'No security threats identified',
     badgeClass: 'bg-green-500 text-white text-lg px-4 py-2 font-bold',
     borderColor: 'border-green-500',
     bgColor: 'bg-green-50/50',

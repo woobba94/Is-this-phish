@@ -170,18 +170,18 @@ export default function Home() {
                   return (
                     <Card 
                       key={level} 
-                      className={`border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                      className={`h-full border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
                       role="listitem"
                     >
-                      <CardContent className="flex items-center gap-4 pt-6">
+                      <CardContent className="flex items-center gap-4 pt-6 h-full">
                         <div className={`${config.badgeClass} rounded-lg flex-shrink-0`} aria-hidden="true">
                           {level}
                         </div>
-                        <div>
-                          <h3 className={`font-semibold ${config.textColor}`}>
+                        <div className="flex-1">
+                          <h3 className={`font-semibold ${config.textColor} mb-1`}>
                             {config.label} Risk
                           </h3>
-                          <p className={`text-sm ${config.subtextColor}`}>
+                          <p className={`text-sm ${config.subtextColor} leading-relaxed`}>
                             {config.description}
                           </p>
                         </div>
