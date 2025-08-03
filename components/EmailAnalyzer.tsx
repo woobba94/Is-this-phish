@@ -93,19 +93,19 @@ export default function EmailAnalyzer() {
   const isNearSizeLimit = content.length > API_CONFIG.MAX_CONTENT_SIZE * 0.75
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-8 p-4">
+    <div className="container mx-auto max-w-6xl space-y-12 p-6">
       {/* Main header */}
-      <header className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <Shield className="w-12 h-12 text-primary" aria-hidden="true" />
-          <h1 className="text-4xl font-bold text-foreground">
+      <header className="text-center space-y-6">
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <Shield className="w-16 h-16 text-primary" aria-hidden="true" />
+          <h1 className="text-5xl font-bold text-foreground">
             Is This Phish?
           </h1>
         </div>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Real-time phishing detection service combining AI and static rules
         </p>
-        <Badge variant="secondary" className="text-sm">
+        <Badge variant="secondary" className="text-base px-4 py-2">
           🤖 Powered by OpenAI GPT-4o
         </Badge>
       </header>
@@ -115,20 +115,20 @@ export default function EmailAnalyzer() {
       {/* Analysis input form */}
       <section aria-labelledby="analysis-form-heading">
         <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2" id="analysis-form-heading">
-              <Search className="w-6 h-6" aria-hidden="true" />
+          <CardHeader className="p-8">
+            <CardTitle className="text-3xl flex items-center gap-3" id="analysis-form-heading">
+              <Search className="w-8 h-8" aria-hidden="true" />
               Phishing Analysis
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-lg mt-3">
               Analyze suspicious emails or URLs to assess risk levels
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8 p-8">
             {/* Input type selection */}
-            <fieldset className="space-y-3">
+            <fieldset className="space-y-4">
               <legend className="sr-only">Select analysis type</legend>
-              <div className="flex justify-center gap-2" role="radiogroup" aria-label="Analysis type selection">
+              <div className="flex justify-center gap-3" role="radiogroup" aria-label="Analysis type selection">
                 {Object.entries(INPUT_TYPES).map(([type, config]) => {
                   const IconComponent = config.icon
                   return (
@@ -136,12 +136,12 @@ export default function EmailAnalyzer() {
                       key={type}
                       variant={inputType === type ? 'default' : 'outline'}
                       onClick={() => setInputType(type as 'email' | 'url')}
-                      className="gap-2"
+                      className="gap-3 text-lg px-8 py-4 h-auto"
                       role="radio"
                       aria-checked={inputType === type}
                       aria-describedby={`${type}-description`}
                     >
-                      <IconComponent className="w-4 h-4" aria-hidden="true" />
+                      <IconComponent className="w-5 h-5" aria-hidden="true" />
                       {config.label}
                     </Button>
                   )
@@ -154,12 +154,12 @@ export default function EmailAnalyzer() {
             </fieldset>
 
             {/* Content input area */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <label htmlFor="content-input" className="text-sm font-medium">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <label htmlFor="content-input" className="text-lg font-medium">
                   {currentConfig.fieldLabel}
                 </label>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-sm">
                   Max {API_CONFIG.MAX_CONTENT_SIZE / 1024}KB
                 </Badge>
               </div>
@@ -168,40 +168,40 @@ export default function EmailAnalyzer() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={currentConfig.placeholder}
-                className="min-h-[200px] resize-none"
+                className="min-h-[250px] resize-none text-base p-4"
                 maxLength={API_CONFIG.MAX_CONTENT_SIZE}
                 aria-describedby="content-help content-count"
                 aria-invalid={isNearSizeLimit ? 'true' : 'false'}
               />
-              <div className="flex justify-between items-center text-sm text-muted-foreground">
+              <div className="flex justify-between items-center text-base text-muted-foreground">
                 <span id="content-count" aria-live="polite">
                   {content.length.toLocaleString()} / {API_CONFIG.MAX_CONTENT_SIZE.toLocaleString()} characters
                 </span>
-                <span id="content-help" className="text-xs" role="status" aria-live="polite">
+                <span id="content-help" className="text-sm" role="status" aria-live="polite">
                   {isNearSizeLimit && 'Warning: Approaching size limit'}
                 </span>
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <Button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || !isContentValid}
-                className="flex-1 gap-2"
+                className="flex-1 gap-3 text-lg px-8 py-4 h-auto"
                 size="lg"
                 variant="destructive"
                 aria-describedby="analyze-button-help"
               >
                 {isAnalyzing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                    <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
                     <span>Analyzing...</span>
                     <span className="sr-only">Analysis in progress, please wait</span>
                   </>
                 ) : (
                   <>
-                    <Search className="w-4 h-4" aria-hidden="true" />
+                    <Search className="w-5 h-5" aria-hidden="true" />
                     Start Analysis
                   </>
                 )}
@@ -211,10 +211,10 @@ export default function EmailAnalyzer() {
                 disabled={isAnalyzing}
                 variant="outline"
                 size="lg"
-                className="gap-2"
+                className="gap-3 text-lg px-8 py-4 h-auto"
                 aria-label="Clear input content"
               >
-                <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                <RotateCcw className="w-5 h-5" aria-hidden="true" />
                 Clear
               </Button>
             </div>
@@ -224,11 +224,11 @@ export default function EmailAnalyzer() {
             </div>
 
             {/* Important notes */}
-            <Alert variant="warning" role="region" aria-labelledby="important-notes">
-              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-              <AlertTitle id="important-notes">Important Notes</AlertTitle>
-              <AlertDescription className="space-y-1 mt-2">
-                <ul className="list-disc list-inside space-y-1">
+            <Alert variant="warning" role="region" aria-labelledby="important-notes" className="p-6">
+              <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+              <AlertTitle id="important-notes" className="text-lg">Important Notes</AlertTitle>
+              <AlertDescription className="space-y-2 mt-3 text-base">
+                <ul className="list-disc list-inside space-y-2">
                   <li>10 analyses per IP address per day</li>
                   <li>Please be careful when entering content containing personal information</li>
                   <li>Analysis results are for reference only, final decisions are the user&apos;s responsibility</li>
@@ -241,17 +241,17 @@ export default function EmailAnalyzer() {
 
       {/* Analysis results */}
       {result && (
-        <section aria-labelledby="results-heading" role="region">
+        <section aria-labelledby="results-heading" role="region" className="space-y-6">
           <h2 id="results-heading" className="sr-only">Analysis Results</h2>
           {result.success && result.result ? (
             <div role="status" aria-live="polite" aria-atomic="true">
               <AnalysisResult result={result.result} originalContent={content} />
             </div>
           ) : (
-            <Alert variant="destructive" role="alert">
-              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-              <AlertTitle>Analysis Failed</AlertTitle>
-              <AlertDescription>
+            <Alert variant="destructive" role="alert" className="p-6">
+              <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+              <AlertTitle className="text-lg">Analysis Failed</AlertTitle>
+              <AlertDescription className="text-base mt-2">
                 {result.error || 'An unknown error occurred.'}
               </AlertDescription>
             </Alert>

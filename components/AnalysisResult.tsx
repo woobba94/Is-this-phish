@@ -31,7 +31,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
     result.highlights.forEach((highlight, index) => {
       const escapedText = highlight.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const regex = new RegExp(escapedText, 'gi')
-      const backgroundColor = `bg-destructive/20 border border-destructive/40 rounded px-1 py-0.5`
+      const backgroundColor = `bg-destructive/20 border border-destructive/40 rounded px-2 py-1`
       
       highlightedContent = highlightedContent.replace(
         regex,
@@ -73,29 +73,29 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <article ref={resultRef} className="shadow-lg border-2" role="main" aria-labelledby="result-title">
         {/* Header */}
-        <CardHeader className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <Shield className="w-8 h-8 text-primary" aria-hidden="true" />
-            <CardTitle className="text-3xl" id="result-title">Phishing Analysis Result</CardTitle>
+        <CardHeader className="text-center space-y-6 p-8">
+          <div className="flex items-center justify-center gap-4">
+            <Shield className="w-10 h-10 text-primary" aria-hidden="true" />
+            <CardTitle className="text-4xl" id="result-title">Phishing Analysis Result</CardTitle>
           </div>
           <div className="flex justify-center" role="status" aria-live="polite" aria-atomic="true">
             <PhishingBadge score={result.score} />
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-10 p-8">
           {/* Analysis summary */}
           <section aria-labelledby="summary-heading">
-            <h2 id="summary-heading" className="text-xl font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5" aria-hidden="true" />
+            <h2 id="summary-heading" className="text-2xl font-semibold flex items-center gap-3 mb-4">
+              <FileText className="w-6 h-6" aria-hidden="true" />
               Analysis Summary
             </h2>
-            <Card className="bg-muted/50 mt-3">
-              <CardContent className="pt-6">
-                <p className="text-foreground leading-relaxed">{result.summary}</p>
+            <Card className="bg-muted/50">
+              <CardContent className="pt-8 p-6">
+                <p className="text-lg text-foreground leading-relaxed">{result.summary}</p>
               </CardContent>
             </Card>
           </section>
@@ -104,13 +104,13 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
 
           {/* Highlighted content */}
           <section aria-labelledby="content-heading">
-            <h2 id="content-heading" className="text-xl font-semibold">
+            <h2 id="content-heading" className="text-2xl font-semibold mb-4">
               Original Content (Suspicious Parts Highlighted)
             </h2>
-            <Card className="mt-3">
-              <CardContent className="p-4">
+            <Card>
+              <CardContent className="p-6">
                 <div 
-                  className="bg-background max-h-96 overflow-y-auto rounded-md border"
+                  className="bg-background max-h-96 overflow-y-auto rounded-md border p-4 text-base"
                   role="region"
                   aria-label="Original content with highlighted suspicious parts"
                   tabIndex={0}
@@ -129,25 +129,25 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
           {/* Risk factors found */}
           {result.highlights.length > 0 && (
             <section aria-labelledby="risk-factors-heading">
-              <div className="space-y-4">
-                <h2 id="risk-factors-heading" className="text-xl font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
+              <div className="space-y-6">
+                <h2 id="risk-factors-heading" className="text-2xl font-semibold flex items-center gap-3">
+                  <AlertTriangle className="w-6 h-6 text-destructive" aria-hidden="true" />
                   Risk Factors Found
-                  <Badge variant="destructive" className="ml-2" aria-label={`${result.highlights.length} risk factors found`}>
+                  <Badge variant="destructive" className="ml-3 text-base px-3 py-1" aria-label={`${result.highlights.length} risk factors found`}>
                     {result.highlights.length} items
                   </Badge>
                 </h2>
-                <ul className="grid gap-3" role="list" aria-label="List of identified risk factors">
+                <ul className="grid gap-4" role="list" aria-label="List of identified risk factors">
                   {result.highlights.map((highlight, index) => (
                     <li key={index}>
-                      <Alert variant="destructive" role="listitem">
-                        <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-                        <AlertDescription className="space-y-1">
-                          <div className="font-medium">
+                      <Alert variant="destructive" role="listitem" className="p-6">
+                        <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+                        <AlertDescription className="space-y-2">
+                          <div className="font-medium text-lg">
                             <span className="sr-only">Suspicious text: </span>
                             &quot;{highlight.text}&quot;
                           </div>
-                          <div className="text-sm opacity-90">
+                          <div className="text-base opacity-90">
                             <span className="sr-only">Reason: </span>
                             {highlight.reason}
                           </div>
@@ -163,24 +163,24 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
           <Separator role="separator" aria-label="Footer section divider" />
 
           {/* Footer information */}
-          <footer className="text-center space-y-2 text-muted-foreground" role="contentinfo">
-            <div className="flex items-center justify-center gap-4 text-sm">
-              <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" aria-hidden="true" />
+          <footer className="text-center space-y-3 text-muted-foreground" role="contentinfo">
+            <div className="flex items-center justify-center gap-6 text-base">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" aria-hidden="true" />
                 <span>
                   <span className="sr-only">Analysis date: </span>
                   {new Date().toLocaleDateString('en-US')}
                 </span>
               </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" aria-hidden="true" />
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5" aria-hidden="true" />
                 <span>
                   <span className="sr-only">Analysis time: </span>
                   {new Date().toLocaleTimeString('en-US')}
                 </span>
               </div>
             </div>
-            <p className="text-xs">Is This Phish? - AI-Powered Phishing Detection Service</p>
+            <p className="text-sm">Is This Phish? - AI-Powered Phishing Detection Service</p>
           </footer>
         </CardContent>
       </article>
@@ -188,19 +188,19 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
       {/* Share section */}
       <section aria-labelledby="share-heading">
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
+          <CardContent className="pt-8 p-6">
+            <div className="text-center space-y-6">
               <h2 id="share-heading" className="sr-only">Share Analysis Result</h2>
               <Button
                 onClick={handleShareAsImage}
-                className="gap-2"
+                className="gap-3 text-lg px-8 py-4 h-auto"
                 size="lg"
                 aria-describedby="share-description"
               >
-                <Download className="w-4 h-4" aria-hidden="true" />
+                <Download className="w-5 h-5" aria-hidden="true" />
                 Save as Image
               </Button>
-              <CardDescription id="share-description">
+              <CardDescription id="share-description" className="text-base">
                 Save the analysis result as an image to share with team members
               </CardDescription>
             </div>

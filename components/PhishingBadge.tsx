@@ -37,19 +37,19 @@ export default function PhishingBadge({ score, className = '' }: PhishingBadgePr
   const IconComponent = getIconForScore(score)
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-4">
       <Badge 
         variant={config.variant} 
-        className={`text-lg px-6 py-3 gap-2 shadow-lg hover:shadow-xl transition-all duration-200 ${className}`}
+        className={`text-xl px-8 py-4 gap-3 shadow-lg hover:shadow-xl transition-all duration-200 ${className}`}
       >
-        <IconComponent className="w-5 h-5" />
-        <span className="font-bold text-xl">{score}</span>
+        <IconComponent className="w-6 h-6" />
+        <span className="font-bold text-2xl">{score}</span>
       </Badge>
-      <div className="text-center space-y-1">
-        <p className="text-sm font-medium text-foreground">
+      <div className="text-center space-y-2">
+        <p className="text-lg font-medium text-foreground">
           {config.label} Risk
         </p>
-        <p className="text-xs text-muted-foreground max-w-[200px]">
+        <p className="text-base text-muted-foreground max-w-[250px] leading-relaxed">
           {config.description}
         </p>
       </div>
