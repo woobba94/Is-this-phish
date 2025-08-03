@@ -1,60 +1,80 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 
-describe('rateLimit', () => {
+describe('rateLimit utils', () => {
+  const originalEnv = process.env
+
   beforeEach(() => {
-    // 각 테스트 전에 rate limit store 초기화 (실제로는 private이지만 테스트를 위해)
-    // 실제 구현에서는 store.clear() 같은 메서드를 추가할 수 있음
+    // 각 테스트 전에 환경변수 초기화
+    process.env = { ...originalEnv }
+  })
+
+  afterAll(() => {
+    // 테스트 완료 후 원래 환경변수 복원
+    process.env = originalEnv
   })
 
   describe('checkRateLimit', () => {
-    it('첫 번째 요청은 허용되어야 함', () => {
-      const ip = '192.168.1.1'
-      const result = checkRateLimit(ip)
+    it('프로덕션 환경에서 첫 번째 요청은 허용되어야 함', () => {
+      process.env.NODE_ENV = 'production'
+      const result = checkRateLimit('192.168.1.1')
       
       expect(result.allowed).toBe(true)
-      expect(result.remaining).toBe(0) // 일일 1회 제한이므로 남은 횟수는 0
+      expect(result.remaining).toBe(0) // 프로덕션에서는 1회 제한
+      expect(result.resetTime).toBeGreaterThan(Date.now())
     })
 
-    it('동일 IP의 두 번째 요청은 거부되어야 함', () => {
-      const ip = '192.168.1.2'
-      
-      // 첫 번째 요청
-      checkRateLimit(ip)
-      
-      // 두 번째 요청
-      const result = checkRateLimit(ip)
+    it('프로덕션 환경에서 두 번째 요청은 거부되어야 함', () => {
+      process.env.NODE_ENV = 'production'
+      checkRateLimit('192.168.1.1') // 첫 번째 요청
+      const result = checkRateLimit('192.168.1.1') // 두 번째 요청
       
       expect(result.allowed).toBe(false)
       expect(result.remaining).toBe(0)
     })
 
-    it('다른 IP는 독립적으로 처리되어야 함', () => {
-      const ip1 = '192.168.1.3'
-      const ip2 = '192.168.1.4'
+    it('개발 환경에서 로컬 IP는 더 많은 요청 허용', () => {
+      process.env.NODE_ENV = 'development'
+      process.env.ALLOW_DEV_MODE = 'true'
       
-      const result1 = checkRateLimit(ip1)
-      const result2 = checkRateLimit(ip2)
+      const result = checkRateLimit('127.0.0.1')
       
-      expect(result1.allowed).toBe(true)
-      expect(result2.allowed).toBe(true)
+      expect(result.allowed).toBe(true)
+      expect(result.remaining).toBe(49) // 개발환경에서는 50회 제한
     })
 
-    it('resetTime이 지난 후에는 다시 허용되어야 함', () => {
-      const ip = '192.168.1.5'
+    it('개발 환경이어도 로컬 IP가 아니면 프로덕션 제한 적용', () => {
+      process.env.NODE_ENV = 'development'
+      process.env.ALLOW_DEV_MODE = 'true'
       
-      // 첫 번째 요청
-      const firstResult = checkRateLimit(ip)
-      expect(firstResult.allowed).toBe(true)
+      const result = checkRateLimit('192.168.1.1')
       
-      // 시간을 조작하기 위해 mock을 사용할 수 있지만,
-      // 여기서는 간단히 resetTime이 설정되는지 확인
-      expect(firstResult.resetTime).toBeGreaterThan(Date.now())
+      expect(result.allowed).toBe(true)
+      expect(result.remaining).toBe(0) // 로컬 IP가 아니므로 1회 제한
+    })
+
+    it('ALLOW_DEV_MODE가 false면 개발환경에서도 프로덕션 제한 적용', () => {
+      process.env.NODE_ENV = 'development'
+      process.env.ALLOW_DEV_MODE = 'false'
+      
+      const result = checkRateLimit('127.0.0.1')
+      
+      expect(result.allowed).toBe(true)
+      expect(result.remaining).toBe(0) // DEV_MODE가 비활성화되어 1회 제한
+    })
+
+    it('다른 IP는 독립적으로 처리되어야 함', () => {
+      process.env.NODE_ENV = 'production'
+      checkRateLimit('192.168.1.1') // 첫 번째 IP에서 요청
+      const result = checkRateLimit('192.168.1.2') // 다른 IP에서 요청
+      
+      expect(result.allowed).toBe(true)
+      expect(result.remaining).toBe(0)
     })
 
     it('rate limit 정보가 올바르게 반환되어야 함', () => {
-      const ip = '192.168.1.6'
-      const result = checkRateLimit(ip)
+      process.env.NODE_ENV = 'production'
+      const result = checkRateLimit('192.168.1.6')
       
       expect(result).toHaveProperty('allowed')
       expect(result).toHaveProperty('remaining')
