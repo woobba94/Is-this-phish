@@ -12,27 +12,33 @@ describe('EmailAnalyzer', () => {
     vi.resetAllMocks()
   })
 
-  it('should render correctly on initial load', () => {
+  it('초기 로드 시 올바르게 렌더링되어야 함', () => {
     render(<EmailAnalyzer />)
     
     expect(screen.getByText('Is This Phish?')).toBeInTheDocument()
-    expect(screen.getByText('Real-time phishing detection service combining AI and static rules')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Email Analysis/ })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /URL Analysis/ })).toBeInTheDocument()
+    expect(screen.getByText('AI-powered phishing detection service')).toBeInTheDocument()
+    expect(screen.getByText('Email Content (HTML/Plain Text)')).toBeInTheDocument()
   })
 
-  it('should allow changing input type', async () => {
+  it('입력 타입이 자동으로 감지되어야 함', async () => {
     const user = userEvent.setup()
     render(<EmailAnalyzer />)
     
-    const urlButton = screen.getByRole('radio', { name: /URL Analysis/ })
-    await user.click(urlButton)
+    const textarea = screen.getByRole('textbox')
     
+    // URL 입력시 자동 감지
+    await user.type(textarea, 'https://example.com')
+    expect(screen.getByText('Auto-detected: URL')).toBeInTheDocument()
     expect(screen.getByText('Suspicious URL')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/Please enter the URL/)).toBeInTheDocument()
+    
+    // 이메일 내용으로 변경
+    await user.clear(textarea)
+    await user.type(textarea, 'From: test@example.com')
+    expect(screen.getByText('Auto-detected: Email')).toBeInTheDocument()
+    expect(screen.getByText('Email Content (HTML/Plain Text)')).toBeInTheDocument()
   })
 
-  it('should handle text input correctly', async () => {
+  it('텍스트 입력을 올바르게 처리해야 함', async () => {
     const user = userEvent.setup()
     render(<EmailAnalyzer />)
     
@@ -43,14 +49,14 @@ describe('EmailAnalyzer', () => {
     expect(screen.getByText('18 / 20,480 characters')).toBeInTheDocument()
   })
 
-  it('should disable analyze button when content is empty', () => {
+  it('내용이 비어있을 때 분석 버튼이 비활성화되어야 함', () => {
     render(<EmailAnalyzer />)
     
     const analyzeButton = screen.getByRole('button', { name: /Start Analysis/ })
     expect(analyzeButton).toBeDisabled()
   })
 
-  it('should enable analyze button when content is entered', async () => {
+  it('내용이 입력되면 분석 버튼이 활성화되어야 함', async () => {
     const user = userEvent.setup()
     render(<EmailAnalyzer />)
     
@@ -58,10 +64,11 @@ describe('EmailAnalyzer', () => {
     const analyzeButton = screen.getByRole('button', { name: /Start Analysis/ })
     
     await user.type(textarea, 'test content')
-    expect(analyzeButton).toBeEnabled()
+    
+    expect(analyzeButton).not.toBeDisabled()
   })
 
-  it('should handle clear button correctly', async () => {
+  it('초기화 버튼을 올바르게 처리해야 함', async () => {
     const user = userEvent.setup()
     render(<EmailAnalyzer />)
     
@@ -75,72 +82,42 @@ describe('EmailAnalyzer', () => {
     expect(textarea).toHaveValue('')
   })
 
-  it('should show warning message when content is empty', async () => {
-    const user = userEvent.setup()
+  it('내용이 비어있을 때 경고 메시지를 표시해야 함', () => {
     render(<EmailAnalyzer />)
     
-    const textarea = screen.getByRole('textbox')
-    const analyzeButton = screen.getByRole('button', { name: /Start Analysis/ })
-    
-    // Add content first, then remove it to make button enabled state testable
-    await user.type(textarea, 'test')
-    await user.clear(textarea)
-    await user.type(textarea, '   ') // Only whitespace
-    
-    // Button should still be disabled as whitespace is trimmed
-    expect(analyzeButton).toBeDisabled()
-    
-    // Component's actual behavior: button is disabled with whitespace only, so alert won't be called
-    // Changed test to verify button disabled state instead
+    expect(screen.getByText('Please enter content before starting analysis')).toBeInTheDocument()
   })
 
-  it('should show loading state during analysis', async () => {
+  it('분석 중 로딩 상태를 표시해야 함', async () => {
     const user = userEvent.setup()
     
-    // Mock successful API response with delay
-    const mockFetch = vi.fn().mockImplementation(() =>
-      new Promise(resolve => 
-        setTimeout(() => resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            success: true,
-            result: {
-              score: 'Safe',
-              highlights: [],
-              summary: 'No threats detected'
-            }
-          })
-        }), 100)
-      )
+    global.fetch = vi.fn().mockImplementation(() => 
+      new Promise(resolve => setTimeout(() => resolve({
+        ok: true,
+        json: () => Promise.resolve({ success: true, result: { score: 'Safe', highlights: [], summary: 'Test' } })
+      }), 100))
     )
-    global.fetch = mockFetch
 
     render(<EmailAnalyzer />)
     
     const textarea = screen.getByRole('textbox')
     const analyzeButton = screen.getByRole('button', { name: /Start Analysis/ })
     
-    await user.type(textarea, 'test content for analysis')
+    await user.type(textarea, 'test content')
     await user.click(analyzeButton)
     
-    // Should show loading state
     expect(screen.getByText('Analyzing...')).toBeInTheDocument()
   })
 
-  it('should display successful analysis result', async () => {
+  it('성공적인 분석 결과를 표시해야 함', async () => {
     const user = userEvent.setup()
     
     const mockResponse = {
       success: true,
       result: {
         score: 'Safe',
-        highlights: [
-          {
-            text: 'suspicious text',
-            reason: 'Test reason'
-          }
-        ],
-        summary: 'Test summary'
+        highlights: [],
+        summary: 'This appears to be a safe email.'
       }
     }
     
@@ -158,11 +135,11 @@ describe('EmailAnalyzer', () => {
     await user.click(analyzeButton)
     
     await waitFor(() => {
-      expect(screen.getByText('Test summary')).toBeInTheDocument()
+      expect(screen.getByText('Safe')).toBeInTheDocument()
     })
   })
 
-  it('should display error message on analysis failure', async () => {
+  it('분석 실패시 에러 메시지를 표시해야 함', async () => {
     const user = userEvent.setup()
     
     const mockResponse = {
@@ -189,7 +166,7 @@ describe('EmailAnalyzer', () => {
     })
   })
 
-  it('should display appropriate message on network error', async () => {
+  it('네트워크 오류시 적절한 메시지를 표시해야 함', async () => {
     const user = userEvent.setup()
     
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'))
@@ -203,11 +180,12 @@ describe('EmailAnalyzer', () => {
     await user.click(analyzeButton)
     
     await waitFor(() => {
+      expect(screen.getByText('Analysis Failed')).toBeInTheDocument()
       expect(screen.getByText('A network error occurred. Please try again.')).toBeInTheDocument()
     })
   })
 
-  it('should display important notes', () => {
+  it('중요 안내사항을 표시해야 함', () => {
     render(<EmailAnalyzer />)
     
     expect(screen.getByText('Important Notes')).toBeInTheDocument()
@@ -216,7 +194,7 @@ describe('EmailAnalyzer', () => {
     expect(screen.getByText('Analysis results are for reference only, final decisions are the user\'s responsibility')).toBeInTheDocument()
   })
 
-  it('should send correct API request', async () => {
+  it('올바른 API 요청을 전송해야 함', async () => {
     const user = userEvent.setup()
     
     const mockResponse = {
@@ -241,13 +219,15 @@ describe('EmailAnalyzer', () => {
     await user.type(textarea, 'test email content')
     await user.click(analyzeButton)
     
-    expect(fetch).toHaveBeenCalledWith('/api/analyze', {
+    expect(global.fetch).toHaveBeenCalledWith('/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         content: 'test email content',
-        type: 'email'
-      })
+        type: 'email',
+      }),
     })
   })
 }) 

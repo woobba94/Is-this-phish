@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,13 +10,25 @@ import { Separator } from '@/components/ui/separator'
 import AnalysisResult from './AnalysisResult'
 import { AnalyzeRequest, AnalyzeResponse } from '@/utils/types'
 import { API_CONFIG } from '@/utils/constants'
-import { Mail, Link, Search, RotateCcw, AlertTriangle, Shield, Loader2 } from 'lucide-react'
+import { Search, RotateCcw, AlertTriangle, Shield, Loader2 } from 'lucide-react'
 
-// Input type configuration
-const INPUT_TYPES = {
+// 자동 감지 함수
+const detectInputType = (content: string): 'email' | 'url' => {
+  const trimmedContent = content.trim()
+  
+  // URL 패턴 감지 (http/https로 시작하거나 도메인 형태)
+  const urlPattern = /^(https?:\/\/|www\.|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i
+  
+  if (urlPattern.test(trimmedContent)) {
+    return 'url'
+  }
+  
+  return 'email' // 기본값은 이메일
+}
+
+// Input configuration
+const INPUT_CONFIG = {
   email: {
-    label: 'Email Analysis',
-    icon: Mail,
     placeholder: `Please paste the complete email content...
 
 Example:
@@ -27,8 +39,6 @@ Hello. Please verify your account immediately for security...`,
     fieldLabel: 'Email Content (HTML/Plain Text)'
   },
   url: {
-    label: 'URL Analysis',
-    icon: Link,
     placeholder: `Please enter the URL...
 
 Example:
@@ -38,10 +48,18 @@ https://suspicious-site.com/login?user=...`,
 } as const
 
 export default function EmailAnalyzer() {
-  const [inputType, setInputType] = useState<'email' | 'url'>('email')
   const [content, setContent] = useState('')
+  const [inputType, setInputType] = useState<'email' | 'url'>('email')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalyzeResponse | null>(null)
+
+  // 내용이 변경될 때 자동으로 타입 감지
+  useEffect(() => {
+    if (content.trim()) {
+      const detectedType = detectInputType(content)
+      setInputType(detectedType)
+    }
+  }, [content])
 
   const handleAnalyze = async () => {
     if (!content.trim()) {
@@ -88,26 +106,23 @@ export default function EmailAnalyzer() {
     setResult(null)
   }
 
-  const currentConfig = INPUT_TYPES[inputType]
+  const currentConfig = INPUT_CONFIG[inputType]
   const isContentValid = content.trim().length > 0
   const isNearSizeLimit = content.length > API_CONFIG.MAX_CONTENT_SIZE * 0.75
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-12 p-6">
+    <div className="container mx-auto max-w-6xl space-y-8 p-6">
       {/* Main header */}
-      <header className="text-center space-y-6">
-        <div className="flex items-center justify-center gap-4 mb-8">
+      <header className="text-center space-y-4">
+        <div className="flex items-center justify-center gap-4 mb-6">
           <Shield className="w-16 h-16 text-primary" aria-hidden="true" />
           <h1 className="text-5xl font-bold text-foreground">
             Is This Phish?
           </h1>
         </div>
-        <p className="text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Real-time phishing detection service combining AI and static rules
+        <p className="text-xl text-muted-foreground max-w-xl mx-auto">
+          AI-powered phishing detection service
         </p>
-        <Badge variant="secondary" className="text-base px-4 py-2">
-          🤖 Powered by OpenAI GPT-4o
-        </Badge>
       </header>
 
       <Separator role="separator" aria-label="Header content divider" />
@@ -115,46 +130,25 @@ export default function EmailAnalyzer() {
       {/* Analysis input form */}
       <section aria-labelledby="analysis-form-heading">
         <Card className="shadow-lg">
-          <CardHeader className="p-8">
+          <CardHeader className="p-6">
             <CardTitle className="text-3xl flex items-center gap-3" id="analysis-form-heading">
               <Search className="w-8 h-8" aria-hidden="true" />
               Phishing Analysis
             </CardTitle>
-            <CardDescription className="text-lg mt-3">
+            <CardDescription className="text-lg mt-2">
               Analyze suspicious emails or URLs to assess risk levels
+              {content.trim() && (
+                <span className="block mt-2 text-sm">
+                  <Badge variant="outline" className="mr-2">
+                    Auto-detected: {inputType === 'email' ? 'Email' : 'URL'}
+                  </Badge>
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-8 p-8">
-            {/* Input type selection */}
-            <fieldset className="space-y-4">
-              <legend className="sr-only">Select analysis type</legend>
-              <div className="flex justify-center gap-3" role="radiogroup" aria-label="Analysis type selection">
-                {Object.entries(INPUT_TYPES).map(([type, config]) => {
-                  const IconComponent = config.icon
-                  return (
-                    <Button
-                      key={type}
-                      variant={inputType === type ? 'default' : 'outline'}
-                      onClick={() => setInputType(type as 'email' | 'url')}
-                      className="gap-3 text-lg px-8 py-4 h-auto"
-                      role="radio"
-                      aria-checked={inputType === type}
-                      aria-describedby={`${type}-description`}
-                    >
-                      <IconComponent className="w-5 h-5" aria-hidden="true" />
-                      {config.label}
-                    </Button>
-                  )
-                })}
-              </div>
-              <div className="sr-only">
-                <div id="email-description">Analyze email content for phishing indicators</div>
-                <div id="url-description">Analyze URL for suspicious characteristics</div>
-              </div>
-            </fieldset>
-
+          <CardContent className="space-y-6 p-6">
             {/* Content input area */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <label htmlFor="content-input" className="text-lg font-medium">
                   {currentConfig.fieldLabel}
@@ -258,6 +252,13 @@ export default function EmailAnalyzer() {
           )}
         </section>
       )}
+
+      {/* Footer with PoweredBy */}
+      <footer className="text-center py-6 border-t">
+        <Badge variant="secondary" className="text-base px-4 py-2">
+          🤖 Powered by OpenAI GPT-4o
+        </Badge>
+      </footer>
     </div>
   )
 } 
