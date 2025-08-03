@@ -20,10 +20,12 @@ export async function POST(request: NextRequest) {
     
     if (!rateLimitInfo.allowed) {
       // 개발 환경 여부에 따라 다른 메시지 표시
-      const isDev = process.env.NODE_ENV === 'development'
+      const isDev = process.env.NODE_ENV === 'development' || 
+                   process.env.VERCEL_ENV === 'preview' ||
+                   process.env.ALLOW_DEV_MODE === 'true'
       const errorMessage = isDev 
         ? '개발 환경 일일 요청 한도(50회)를 초과했습니다. 24시간 후 다시 시도해주세요.'
-        : '일일 요청 한도를 초과했습니다. 24시간 후 다시 시도해주세요.'
+        : '일일 요청 한도(10회)를 초과했습니다. 24시간 후 다시 시도해주세요.'
       
       return NextResponse.json(
         { 

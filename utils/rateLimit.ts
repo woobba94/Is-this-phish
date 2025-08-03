@@ -4,44 +4,49 @@ import { RateLimitInfo } from './types'
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
 
 const RATE_LIMIT_WINDOW = 24 * 60 * 60 * 1000 // 24시간 (ms)
-const RATE_LIMIT_MAX = 1 // 1회/일
-
-// 개발 환경 전용 설정 (안전한 제한)
-const DEV_RATE_LIMIT_MAX = 50 // 개발 환경에서도 하루 50회로 제한 (API 비용 보호)
-const LOCAL_IPS = ['127.0.0.1', '::1', 'localhost']
+const RATE_LIMIT_MAX = 10 // 10회/일로 증가
+const DEV_RATE_LIMIT_MAX = 50 // 개발 환경에서 50회
 
 /**
- * 안전한 개발자 모드 체크
- * - 프로덕션에서는 절대 우회 불가
- * - 로컬 개발환경에서만 제한 완화
- * - 개발환경에서도 적당한 제한 유지 (API 비용 보호)
+ * 개발 환경 감지 로직 개선
  */
-function isDeveloperMode(ip: string): boolean {
-  // 1단계: 프로덕션 환경에서는 절대 우회 불가
-  if (process.env.NODE_ENV === 'production') {
-    return false
+function isDeveloperMode(): boolean {
+  // 1. NODE_ENV가 development인 경우
+  if (process.env.NODE_ENV === 'development') {
+    return true
   }
   
-  // 2단계: 개발환경이어도 로컬 IP가 아니면 우회 불가
-  if (!LOCAL_IPS.includes(ip)) {
-    return false
+  // 2. Vercel 프리뷰 배포인 경우 (dev 브랜치 등)
+  if (process.env.VERCEL_ENV === 'preview') {
+    return true
   }
   
-  // 3단계: 추가 안전 장치 - 환경변수로 명시적 활성화 필요
-  if (process.env.ALLOW_DEV_MODE !== 'true') {
-    return false
+  // 3. 개발용 환경변수가 설정된 경우
+  if (process.env.ALLOW_DEV_MODE === 'true') {
+    return true
   }
   
-  return true
+  // 4. 로컬 호스트명이나 개발 URL 패턴인 경우
+  const vercelUrl = process.env.VERCEL_URL
+  if (vercelUrl && (vercelUrl.includes('localhost') || vercelUrl.includes('-dev-') || vercelUrl.includes('.vercel.app'))) {
+    return true
+  }
+  
+  return false
 }
 
 export function checkRateLimit(ip: string): RateLimitInfo {
   const now = Date.now()
   const key = `rate_limit:${ip}`
   
-  // 개발자 모드 체크 (다층 안전 검증)
-  const isDevMode = isDeveloperMode(ip)
+  // 개발자 모드 체크 (개선된 로직)
+  const isDevMode = isDeveloperMode()
   const currentLimit = isDevMode ? DEV_RATE_LIMIT_MAX : RATE_LIMIT_MAX
+  
+  // 디버깅을 위한 로그 (개발 환경에서만)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Rate limit check - IP: ${ip}, DevMode: ${isDevMode}, Limit: ${currentLimit}`)
+  }
   
   const existing = rateLimitStore.get(key)
   
