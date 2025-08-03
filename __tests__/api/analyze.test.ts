@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/analyze/route'
+import { NextRequest } from 'next/server'
+import { checkRateLimit } from '@/utils/rateLimit'
+import { applyStaticRules, getPhishingScore } from '@/utils/staticRules'
 
 // Global storage for mock function
 declare global {
@@ -55,18 +58,15 @@ describe('/api/analyze', () => {
     } as any
 
     // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
+    vi.mocked(checkRateLimit).mockReturnValue({
       allowed: true,
       remaining: 0,
       resetTime: Date.now() + 86400000
     })
 
     // Static rules mock
-    const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
-    ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('Safe')
+    vi.mocked(applyStaticRules).mockReturnValue([])
+    vi.mocked(getPhishingScore).mockReturnValue('Safe')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -92,123 +92,108 @@ describe('/api/analyze', () => {
   })
 
   it('rate limit 초과 시 429 에러를 반환해야 함', async () => {
-    const mockRequest = {
-      json: () => Promise.resolve({
+    // Mock rate limit exceeded
+    vi.mocked(checkRateLimit).mockReturnValue({
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + 24 * 60 * 60 * 1000
+    })
+
+    const request = new NextRequest('http://localhost:3000/api/analyze', {
+      method: 'POST',
+      body: JSON.stringify({
         content: 'test email content',
         type: 'email'
       }),
-      headers: {
-        get: () => '192.168.1.1'
-      }
-    } as any
-
-    // Rate limit mock - 제한 초과
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
-      allowed: false,
-      remaining: 0,
-      resetTime: Date.now() + 86400000
+      headers: { 'Content-Type': 'application/json' }
     })
 
-    const response = await POST(mockRequest)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(429)
     expect(data.success).toBe(false)
-    expect(data.error).toContain('일일 요청 한도(10회)를 초과했습니다')
+    expect(data.error).toContain('Daily request limit (10 requests) exceeded')
   })
 
   it('빈 내용 요청 시 400 에러를 반환해야 함', async () => {
-    const mockRequest = {
-      json: () => Promise.resolve({
+    // Mock successful rate limit check
+    vi.mocked(checkRateLimit).mockReturnValue({
+      allowed: true,
+      remaining: 9,
+      resetTime: Date.now() + 24 * 60 * 60 * 1000
+    })
+
+    const request = new NextRequest('http://localhost:3000/api/analyze', {
+      method: 'POST',
+      body: JSON.stringify({
         content: '',
         type: 'email'
       }),
-      headers: {
-        get: () => '192.168.1.1'
-      }
-    } as any
-
-    // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
-      allowed: true,
-      remaining: 0,
-      resetTime: Date.now() + 86400000
+      headers: { 'Content-Type': 'application/json' }
     })
 
-    const response = await POST(mockRequest)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
     expect(data.success).toBe(false)
-    expect(data.error).toContain('유효하지 않은 입력입니다')
+    expect(data.error).toContain('Invalid input provided')
   })
 
   it('크기 제한 초과 시 400 에러를 반환해야 함', async () => {
-    const mockRequest = {
-      json: () => Promise.resolve({
-        content: 'a'.repeat(21 * 1024), // 21KB
-        type: 'email'
-      }),
-      headers: {
-        get: () => '192.168.1.1'
-      }
-    } as any
-
-    // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
+    // Mock successful rate limit check
+    vi.mocked(checkRateLimit).mockReturnValue({
       allowed: true,
-      remaining: 0,
-      resetTime: Date.now() + 86400000
+      remaining: 9,
+      resetTime: Date.now() + 24 * 60 * 60 * 1000
     })
 
-    const response = await POST(mockRequest)
+    const largeContent = 'a'.repeat(21 * 1024) // 21KB content
+
+    const request = new NextRequest('http://localhost:3000/api/analyze', {
+      method: 'POST',
+      body: JSON.stringify({
+        content: largeContent,
+        type: 'email'
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
     expect(data.success).toBe(false)
-    expect(data.error).toContain('입력 크기가 20KB를 초과했습니다')
+    expect(data.error).toContain('Input size exceeds 20KB limit')
   })
 
   it('OpenAI API 에러 시 500 에러를 반환해야 함', async () => {
-    const mockRequest = {
-      json: () => Promise.resolve({
+    // Mock successful rate limit check
+    vi.mocked(checkRateLimit).mockReturnValue({
+      allowed: true,
+      remaining: 9,
+      resetTime: Date.now() + 24 * 60 * 60 * 1000
+    })
+
+         // Mock OpenAI API error
+     mockCreate.mockRejectedValueOnce(new Error('OpenAI API Error'))
+
+    const request = new NextRequest('http://localhost:3000/api/analyze', {
+      method: 'POST',
+      body: JSON.stringify({
         content: 'test email content',
         type: 'email'
       }),
-      headers: {
-        get: () => '192.168.1.1'
-      }
-    } as any
-
-    // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
-      allowed: true,
-      remaining: 0,
-      resetTime: Date.now() + 86400000
+      headers: { 'Content-Type': 'application/json' }
     })
 
-    // Static rules mock
-    const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
-    ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('Safe')
-
-    // OpenAI mock - 에러 발생
-    mockCreate.mockRejectedValue(new Error('OpenAI API Error'))
-
-    const response = await POST(mockRequest)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(500)
     expect(data.success).toBe(false)
-    expect(data.error).toContain('서버 오류가 발생했습니다')
+    expect(data.error).toContain('A server error occurred')
   })
 
   it('정적 규칙과 AI 결과를 올바르게 병합해야 함', async () => {
@@ -223,20 +208,17 @@ describe('/api/analyze', () => {
     } as any
 
     // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
+    vi.mocked(checkRateLimit).mockReturnValue({
       allowed: true,
       remaining: 0,
       resetTime: Date.now() + 86400000
     })
 
     // Static rules mock
-    const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
-    ;(applyStaticRules as any).mockReturnValue([
+    vi.mocked(applyStaticRules).mockReturnValue([
       { text: 'bit.ly/test', reason: '단축 URL 사용' }
     ])
-    ;(getPhishingScore as any).mockReturnValue('Medium')
+    vi.mocked(getPhishingScore).mockReturnValue('Medium')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -276,18 +258,15 @@ describe('/api/analyze', () => {
     } as any
 
     // Rate limit mock
-    const { checkRateLimit, getRealIP } = await import('@/utils/rateLimit')
-    ;(getRealIP as any).mockReturnValue('192.168.1.1')
-    ;(checkRateLimit as any).mockReturnValue({
+    vi.mocked(checkRateLimit).mockReturnValue({
       allowed: true,
       remaining: 0,
       resetTime: Date.now() + 86400000
     })
 
     // Static rules mock
-    const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
-    ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('Safe')
+    vi.mocked(applyStaticRules).mockReturnValue([])
+    vi.mocked(getPhishingScore).mockReturnValue('Safe')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({

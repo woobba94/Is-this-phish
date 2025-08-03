@@ -17,19 +17,19 @@ describe('EmailAnalyzer', () => {
     
     expect(screen.getByText('Is This Phish?')).toBeInTheDocument()
     expect(screen.getByText('Real-time phishing detection service combining AI and static rules')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Email Analysis/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /URL Analysis/ })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Email Analysis/ })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /URL Analysis/ })).toBeInTheDocument()
   })
 
   it('should allow changing input type', async () => {
     const user = userEvent.setup()
     render(<EmailAnalyzer />)
     
-    const urlButton = screen.getByRole('button', { name: /URL Analysis/ })
+    const urlButton = screen.getByRole('radio', { name: /URL Analysis/ })
     await user.click(urlButton)
     
     expect(screen.getByText('Suspicious URL')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/Please enter the suspicious URL to analyze/)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Please enter the URL/)).toBeInTheDocument()
   })
 
   it('should handle text input correctly', async () => {
@@ -184,7 +184,7 @@ describe('EmailAnalyzer', () => {
     await user.click(analyzeButton)
     
     await waitFor(() => {
-      expect(screen.getByText('Analysis failed')).toBeInTheDocument()
+      expect(screen.getByText('Analysis Failed')).toBeInTheDocument()
       expect(screen.getByText('API error occurred')).toBeInTheDocument()
     })
   })
