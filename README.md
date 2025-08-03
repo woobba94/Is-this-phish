@@ -60,11 +60,7 @@ cd is-this-phish
 
 ### 2. 종속성 설치
 ```bash
-npm install
-# 또는
 yarn install
-# 또는
-pnpm install
 ```
 
 ### 3. 환경변수 설정
@@ -75,11 +71,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ### 4. 개발 서버 실행
 ```bash
-npm run dev
-# 또는
 yarn dev
-# 또는
-pnpm dev
 ```
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 서비스를 확인하세요.
@@ -88,17 +80,17 @@ pnpm dev
 
 ### 단위 테스트 실행
 ```bash
-npm run test
+yarn test
 ```
 
 ### 커버리지 보고서 생성
 ```bash
-npm run test:coverage
+yarn test:coverage
 ```
 
 ### 테스트 UI 실행
 ```bash
-npm run test:ui
+yarn test:ui
 ```
 
 ## 📁 프로젝트 구조
@@ -132,7 +124,7 @@ Is-this-phish/
 
 ### 1. Vercel CLI 설치
 ```bash
-npm i -g vercel
+yarn global add vercel
 ```
 
 ### 2. 프로젝트 배포
@@ -227,6 +219,16 @@ vercel --prod
 
 - **이슈 리포트**: [GitHub Issues](https://github.com/your-username/is-this-phish/issues)
 - **기능 요청**: [GitHub Discussions](https://github.com/your-username/is-this-phish/discussions)
+
+---
+
+## 🚀 다음 단계
+
+1. **패키지 설치**: `yarn install`
+2. **환경변수 설정**: `.env.local`에 `OPENAI_API_KEY` 추가
+3. **개발 서버 실행**: `yarn dev`
+4. **테스트 실행**: `yarn test:coverage`
+5. **Vercel 배포**: `vercel --prod`
 
 ---
 
