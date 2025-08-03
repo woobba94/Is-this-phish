@@ -29,69 +29,76 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen bg-gradient-to-br from-background to-muted/20`}>
-        <main className="pb-16">
+        {/* Skip to main content link for keyboard navigation */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+        >
+          Skip to main content
+        </a>
+        
+        <main id="main-content" className="pb-16" role="main">
           {children}
         </main>
         
-        {/* 푸터 */}
-        <footer className="bg-card border-t mt-16">
+        <footer className="bg-card border-t mt-16" role="contentinfo">
           <div className="container mx-auto px-4 py-12">
             <div className="grid md:grid-cols-4 gap-8">
-              {/* 브랜드 섹션 */}
-              <div className="md:col-span-2 space-y-4">
+              {/* Brand section */}
+              <section className="md:col-span-2 space-y-4" aria-labelledby="brand-heading">
                 <div className="flex items-center gap-3">
-                  <Shield className="w-8 h-8 text-primary" />
-                  <h3 className="text-2xl font-bold">Is This Phish?</h3>
+                  <Shield className="w-8 h-8 text-primary" aria-hidden="true" />
+                  <h2 id="brand-heading" className="text-2xl font-bold">Is This Phish?</h2>
                 </div>
                 <p className="text-muted-foreground max-w-md">
-                  AI와 정적 규칙을 결합한 실시간 피싱 탐지 서비스로 
-                  이메일과 URL의 보안 위험도를 정확하게 분석합니다.
+                  AI-powered real-time phishing detection service that combines AI and static rules 
+                  to accurately analyze security risks in emails and URLs.
                 </p>
-                <div className="flex gap-2">
-                  <Badge variant="secondary" className="gap-1">
-                    <Shield className="w-3 h-3" />
-                    99.8% 정확도
+                <div className="flex gap-2" role="list" aria-label="Service highlights">
+                  <Badge variant="secondary" className="gap-1" role="listitem">
+                    <Shield className="w-3 h-3" aria-hidden="true" />
+                    99.8% Accuracy
                   </Badge>
-                  <Badge variant="outline" className="gap-1">
-                    ⚡ 3초 분석
+                  <Badge variant="outline" className="gap-1" role="listitem">
+                    <span aria-hidden="true">⚡</span> 3-second Analysis
                   </Badge>
                 </div>
-              </div>
+              </section>
               
-              {/* 통계 섹션 */}
-              <div className="space-y-4">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" />
-                  서비스 통계
-                </h4>
+              {/* Statistics section */}
+              <section className="space-y-4" aria-labelledby="stats-heading">
+                <h3 id="stats-heading" className="font-semibold flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" aria-hidden="true" />
+                  Service Statistics
+                </h3>
                 <ul className="text-muted-foreground text-sm space-y-2">
-                  <li>• 2024년 한국 피싱 메일 신고 61% 증가</li>
-                  <li>• 실시간 AI 분석으로 3초 내 결과 제공</li>
-                  <li>• IP당 일 1회 무료 분석 지원</li>
-                  <li>• OpenAI GPT-4o 기반 분석 엔진</li>
+                  <li>• 61% increase in phishing reports in Korea in 2024</li>
+                  <li>• Real-time AI analysis with results in 3 seconds</li>
+                  <li>• Free daily analysis per IP address</li>
+                  <li>• Powered by OpenAI GPT-4o analysis engine</li>
                 </ul>
-              </div>
+              </section>
               
-              {/* 보안 수칙 섹션 */}
-              <div className="space-y-4">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  보안 수칙
-                </h4>
+              {/* Security guidelines section */}
+              <section className="space-y-4" aria-labelledby="security-heading">
+                <h3 id="security-heading" className="font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                  Security Guidelines
+                </h3>
                 <ul className="text-muted-foreground text-sm space-y-2">
-                  <li>• 의심스러운 링크 클릭 금지</li>
-                  <li>• 개인정보 입력 전 도메인 확인</li>
-                  <li>• 첨부파일 실행 전 검증 필수</li>
-                  <li>• 금융 정보 요구 시 공식 채널 확인</li>
+                  <li>• Never click suspicious links</li>
+                  <li>• Verify domains before entering personal information</li>
+                  <li>• Always verify attachments before opening</li>
+                  <li>• Use official channels for financial requests</li>
                 </ul>
-              </div>
+              </section>
             </div>
             
             <Separator className="my-8" />
             
-            {/* 하단 정보 */}
+            {/* Bottom information */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-4">
                 <p>&copy; 2024 Is This Phish. All rights reserved.</p>
@@ -101,17 +108,18 @@ export default function RootLayout({
               </div>
               <div className="flex items-center gap-4">
                 <p className="text-center">
-                  AI 기반 피싱 탐지로 더 안전한 인터넷을 만들어갑니다.
+                  Building a safer internet with AI-powered phishing detection.
                 </p>
               </div>
             </div>
             
-            {/* 면책 조항 */}
-            <Card className="mt-6 bg-muted/50">
+            {/* Disclaimer */}
+            <Card className="mt-6 bg-muted/50" role="note" aria-labelledby="disclaimer-heading">
               <CardContent className="pt-6">
+                <h4 id="disclaimer-heading" className="sr-only">Important Disclaimer</h4>
                 <p className="text-xs text-muted-foreground text-center">
-                  ⚠️ 이 서비스는 참고용이며, 최종 보안 판단은 항상 사용자의 책임입니다. 
-                  중요한 보안 결정은 전문가와 상의하시기 바랍니다.
+                  ⚠️ This service is for reference only. Final security decisions are always the user&apos;s responsibility. 
+                  Please consult with security professionals for important security decisions.
                 </p>
               </CardContent>
             </Card>

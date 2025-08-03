@@ -94,10 +94,10 @@ export default function EmailAnalyzer() {
 
   return (
     <div className="container mx-auto max-w-6xl space-y-8 p-4">
-      {/* 메인 헤더 */}
-      <div className="text-center space-y-4">
+      {/* Main header */}
+      <header className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3 mb-6">
-          <Shield className="w-12 h-12 text-primary" />
+          <Shield className="w-12 h-12 text-primary" aria-hidden="true" />
           <h1 className="text-4xl font-bold text-foreground">
             Is This Phish?
           </h1>
@@ -108,126 +108,155 @@ export default function EmailAnalyzer() {
         <Badge variant="secondary" className="text-sm">
           🤖 Powered by OpenAI GPT-4o
         </Badge>
-      </div>
+      </header>
 
-      <Separator />
+      <Separator role="separator" aria-label="Header content divider" />
 
-      {/* 분석 입력 카드 */}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center gap-2">
-            <Search className="w-6 h-6" />
-            Phishing Analysis
-          </CardTitle>
-          <CardDescription>
-            Analyze suspicious emails or URLs to assess risk levels
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* 입력 타입 선택 */}
-          <div className="flex justify-center gap-2">
-            {Object.entries(INPUT_TYPES).map(([type, config]) => {
-              const IconComponent = config.icon
-              return (
-                <Button
-                  key={type}
-                  variant={inputType === type ? 'default' : 'outline'}
-                  onClick={() => setInputType(type as 'email' | 'url')}
-                  className="gap-2"
-                >
-                  <IconComponent className="w-4 h-4" />
-                  {config.label}
-                </Button>
-              )
-            })}
-          </div>
+      {/* Analysis input form */}
+      <section aria-labelledby="analysis-form-heading">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center gap-2" id="analysis-form-heading">
+              <Search className="w-6 h-6" aria-hidden="true" />
+              Phishing Analysis
+            </CardTitle>
+            <CardDescription>
+              Analyze suspicious emails or URLs to assess risk levels
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Input type selection */}
+            <fieldset className="space-y-3">
+              <legend className="sr-only">Select analysis type</legend>
+              <div className="flex justify-center gap-2" role="radiogroup" aria-label="Analysis type selection">
+                {Object.entries(INPUT_TYPES).map(([type, config]) => {
+                  const IconComponent = config.icon
+                  return (
+                    <Button
+                      key={type}
+                      variant={inputType === type ? 'default' : 'outline'}
+                      onClick={() => setInputType(type as 'email' | 'url')}
+                      className="gap-2"
+                      role="radio"
+                      aria-checked={inputType === type}
+                      aria-describedby={`${type}-description`}
+                    >
+                      <IconComponent className="w-4 h-4" aria-hidden="true" />
+                      {config.label}
+                    </Button>
+                  )
+                })}
+              </div>
+              <div className="sr-only">
+                <div id="email-description">Analyze email content for phishing indicators</div>
+                <div id="url-description">Analyze URL for suspicious characteristics</div>
+              </div>
+            </fieldset>
 
-          {/* 입력 영역 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">
-                {currentConfig.fieldLabel}
-              </label>
-              <Badge variant="outline" className="text-xs">
-                Max {API_CONFIG.MAX_CONTENT_SIZE / 1024}KB
-              </Badge>
+            {/* Content input area */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <label htmlFor="content-input" className="text-sm font-medium">
+                  {currentConfig.fieldLabel}
+                </label>
+                <Badge variant="outline" className="text-xs">
+                  Max {API_CONFIG.MAX_CONTENT_SIZE / 1024}KB
+                </Badge>
+              </div>
+              <Textarea
+                id="content-input"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={currentConfig.placeholder}
+                className="min-h-[200px] resize-none"
+                maxLength={API_CONFIG.MAX_CONTENT_SIZE}
+                aria-describedby="content-help content-count"
+                aria-invalid={isNearSizeLimit ? 'true' : 'false'}
+              />
+              <div className="flex justify-between items-center text-sm text-muted-foreground">
+                <span id="content-count" aria-live="polite">
+                  {content.length.toLocaleString()} / {API_CONFIG.MAX_CONTENT_SIZE.toLocaleString()} characters
+                </span>
+                <span id="content-help" className="text-xs" role="status" aria-live="polite">
+                  {isNearSizeLimit && 'Warning: Approaching size limit'}
+                </span>
+              </div>
             </div>
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={currentConfig.placeholder}
-              className="min-h-[200px] resize-none"
-              maxLength={API_CONFIG.MAX_CONTENT_SIZE}
-            />
-            <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>{content.length.toLocaleString()} / {API_CONFIG.MAX_CONTENT_SIZE.toLocaleString()} characters</span>
-              <span className="text-xs">
-                {isNearSizeLimit && '⚠️ Approaching size limit'}
-              </span>
+
+            {/* Action buttons */}
+            <div className="flex gap-3">
+              <Button
+                onClick={handleAnalyze}
+                disabled={isAnalyzing || !isContentValid}
+                className="flex-1 gap-2"
+                size="lg"
+                variant="destructive"
+                aria-describedby="analyze-button-help"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                    <span>Analyzing...</span>
+                    <span className="sr-only">Analysis in progress, please wait</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" aria-hidden="true" />
+                    Start Analysis
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleClear}
+                disabled={isAnalyzing}
+                variant="outline"
+                size="lg"
+                className="gap-2"
+                aria-label="Clear input content"
+              >
+                <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                Clear
+              </Button>
             </div>
-          </div>
+            <div id="analyze-button-help" className="sr-only">
+              {!isContentValid && 'Please enter content before starting analysis'}
+              {isAnalyzing && 'Analysis is currently in progress'}
+            </div>
 
-          {/* 버튼 그룹 */}
-          <div className="flex gap-3">
-            <Button
-              onClick={handleAnalyze}
-              disabled={isAnalyzing || !isContentValid}
-              className="flex-1 gap-2"
-              size="lg"
-              variant="destructive"
-            >
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Search className="w-4 h-4" />
-                  Start Analysis
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={handleClear}
-              disabled={isAnalyzing}
-              variant="outline"
-              size="lg"
-              className="gap-2"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Clear
-            </Button>
-          </div>
+            {/* Important notes */}
+            <Alert variant="warning" role="region" aria-labelledby="important-notes">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              <AlertTitle id="important-notes">Important Notes</AlertTitle>
+              <AlertDescription className="space-y-1 mt-2">
+                <ul className="list-disc list-inside space-y-1">
+                  <li>One analysis per IP address per day</li>
+                  <li>Please be careful when entering content with personal information</li>
+                  <li>Analysis results are for reference only, final judgment should be made by the user</li>
+                </ul>
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </section>
 
-          {/* 주의사항 */}
-          <Alert variant="warning">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Important Notes</AlertTitle>
-            <AlertDescription className="space-y-1 mt-2">
-              <div>• One analysis per IP address per day</div>
-              <div>• Please be careful when entering content with personal information</div>
-              <div>• Analysis results are for reference only, final judgment should be made by the user</div>
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-
-      {/* 결과 표시 */}
+      {/* Analysis results */}
       {result && (
-        <div>
+        <section aria-labelledby="results-heading" role="region">
+          <h2 id="results-heading" className="sr-only">Analysis Results</h2>
           {result.success && result.result ? (
-            <AnalysisResult result={result.result} originalContent={content} />
+            <div role="status" aria-live="polite" aria-atomic="true">
+              <AnalysisResult result={result.result} originalContent={content} />
+            </div>
           ) : (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
+            <Alert variant="destructive" role="alert">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               <AlertTitle>Analysis Failed</AlertTitle>
               <AlertDescription>
                 {result.error || 'An unknown error occurred.'}
               </AlertDescription>
             </Alert>
           )}
-        </div>
+        </section>
       )}
     </div>
   )

@@ -35,7 +35,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
       
       highlightedContent = highlightedContent.replace(
         regex,
-        `<span class="${backgroundColor}" title="${highlight.reason}" data-highlight-id="${index}">${highlight.text}</span>`
+        `<span class="${backgroundColor}" title="${highlight.reason}" data-highlight-id="${index}" role="mark" aria-label="Suspicious text: ${highlight.text}. Reason: ${highlight.reason}">${highlight.text}</span>`
       )
     })
     
@@ -59,6 +59,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
           const link = document.createElement('a')
           link.href = url
           link.download = `phishing-analysis-${result.score}-${Date.now()}.png`
+          link.setAttribute('aria-label', `Download analysis result as image. Risk level: ${result.score}`)
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
@@ -73,42 +74,47 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
 
   return (
     <div className="space-y-6">
-      <Card ref={resultRef} className="shadow-lg border-2">
-        {/* 헤더 */}
+      <article ref={resultRef} className="shadow-lg border-2" role="main" aria-labelledby="result-title">
+        {/* Header */}
         <CardHeader className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3">
-            <Shield className="w-8 h-8 text-primary" />
-            <CardTitle className="text-3xl">Phishing Analysis Result</CardTitle>
+            <Shield className="w-8 h-8 text-primary" aria-hidden="true" />
+            <CardTitle className="text-3xl" id="result-title">Phishing Analysis Result</CardTitle>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center" role="status" aria-live="polite" aria-atomic="true">
             <PhishingBadge score={result.score} />
           </div>
         </CardHeader>
 
         <CardContent className="space-y-8">
-          {/* 분석 요약 */}
-          <div className="space-y-3">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+          {/* Analysis summary */}
+          <section aria-labelledby="summary-heading">
+            <h2 id="summary-heading" className="text-xl font-semibold flex items-center gap-2">
+              <FileText className="w-5 h-5" aria-hidden="true" />
               Analysis Summary
-            </h3>
-            <Card className="bg-muted/50">
+            </h2>
+            <Card className="bg-muted/50 mt-3">
               <CardContent className="pt-6">
                 <p className="text-foreground leading-relaxed">{result.summary}</p>
               </CardContent>
             </Card>
-          </div>
+          </section>
 
-          <Separator />
+          <Separator role="separator" aria-label="Content section divider" />
 
-          {/* 하이라이트된 컨텐츠 */}
-          <div className="space-y-3">
-            <h3 className="text-xl font-semibold">
+          {/* Highlighted content */}
+          <section aria-labelledby="content-heading">
+            <h2 id="content-heading" className="text-xl font-semibold">
               Original Content (Suspicious Parts Highlighted)
-            </h3>
-            <Card>
+            </h2>
+            <Card className="mt-3">
               <CardContent className="p-4">
-                <div className="bg-background max-h-96 overflow-y-auto rounded-md border">
+                <div 
+                  className="bg-background max-h-96 overflow-y-auto rounded-md border"
+                  role="region"
+                  aria-label="Original content with highlighted suspicious parts"
+                  tabIndex={0}
+                >
                   <ReactQuill
                     value={getHighlightedContent()}
                     readOnly={true}
@@ -118,69 +124,89 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </section>
 
-          {/* 발견된 위험 요소 */}
+          {/* Risk factors found */}
           {result.highlights.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-                Risk Factors Found
-                <Badge variant="destructive" className="ml-2">
-                  {result.highlights.length} items
-                </Badge>
-              </h3>
-              <div className="grid gap-3">
-                {result.highlights.map((highlight, index) => (
-                  <Alert key={index} variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription className="space-y-1">
-                      <div className="font-medium">&quot;{highlight.text}&quot;</div>
-                      <div className="text-sm opacity-90">{highlight.reason}</div>
-                    </AlertDescription>
-                  </Alert>
-                ))}
+            <section aria-labelledby="risk-factors-heading">
+              <div className="space-y-4">
+                <h2 id="risk-factors-heading" className="text-xl font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
+                  Risk Factors Found
+                  <Badge variant="destructive" className="ml-2" aria-label={`${result.highlights.length} risk factors found`}>
+                    {result.highlights.length} items
+                  </Badge>
+                </h2>
+                <ul className="grid gap-3" role="list" aria-label="List of identified risk factors">
+                  {result.highlights.map((highlight, index) => (
+                    <li key={index}>
+                      <Alert variant="destructive" role="listitem">
+                        <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+                        <AlertDescription className="space-y-1">
+                          <div className="font-medium">
+                            <span className="sr-only">Suspicious text: </span>
+                            &quot;{highlight.text}&quot;
+                          </div>
+                          <div className="text-sm opacity-90">
+                            <span className="sr-only">Reason: </span>
+                            {highlight.reason}
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            </section>
           )}
 
-          <Separator />
+          <Separator role="separator" aria-label="Footer section divider" />
 
-          {/* 푸터 정보 */}
-          <div className="text-center space-y-2 text-muted-foreground">
+          {/* Footer information */}
+          <footer className="text-center space-y-2 text-muted-foreground" role="contentinfo">
             <div className="flex items-center justify-center gap-4 text-sm">
               <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                Analysis Date: {new Date().toLocaleDateString('en-US')}
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                <span>
+                  <span className="sr-only">Analysis date: </span>
+                  {new Date().toLocaleDateString('en-US')}
+                </span>
               </div>
               <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {new Date().toLocaleTimeString('en-US')}
+                <Clock className="w-4 h-4" aria-hidden="true" />
+                <span>
+                  <span className="sr-only">Analysis time: </span>
+                  {new Date().toLocaleTimeString('en-US')}
+                </span>
               </div>
             </div>
             <p className="text-xs">Is This Phish? - AI-Powered Phishing Detection Service</p>
-          </div>
+          </footer>
         </CardContent>
-      </Card>
+      </article>
 
-      {/* 공유 버튼 */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center space-y-4">
-            <Button
-              onClick={handleShareAsImage}
-              className="gap-2"
-              size="lg"
-            >
-              <Download className="w-4 h-4" />
-              Save as Image
-            </Button>
-            <CardDescription>
-              Save the analysis result as an image to share with team members
-            </CardDescription>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Share section */}
+      <section aria-labelledby="share-heading">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <h2 id="share-heading" className="sr-only">Share Analysis Result</h2>
+              <Button
+                onClick={handleShareAsImage}
+                className="gap-2"
+                size="lg"
+                aria-describedby="share-description"
+              >
+                <Download className="w-4 h-4" aria-hidden="true" />
+                Save as Image
+              </Button>
+              <CardDescription id="share-description">
+                Save the analysis result as an image to share with team members
+              </CardDescription>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   )
 } 
