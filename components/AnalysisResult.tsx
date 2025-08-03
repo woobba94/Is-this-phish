@@ -135,7 +135,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
                   <Alert key={index} variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription className="space-y-1">
-                      <div className="font-medium">"{highlight.text}"</div>
+                      <div className="font-medium">&quot;{highlight.text}&quot;</div>
                       <div className="text-sm opacity-90">{highlight.reason}</div>
                     </AlertDescription>
                   </Alert>
