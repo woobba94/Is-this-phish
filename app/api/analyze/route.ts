@@ -2,13 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 import { applyStaticRules, getPhishingScore } from '@/utils/staticRules'
-import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore } from '@/utils/types'
+import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore, PhishingScoreEn } from '@/utils/types'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 const MAX_CONTENT_SIZE = 20 * 1024 // 20KB
+
+// 영문 점수를 한글로 매핑
+const SCORE_MAPPING: Record<PhishingScoreEn, PhishingScore> = {
+  'SAFE': '안전',
+  'LOW': '낮음', 
+  'MEDIUM': '보통',
+  'HIGH': '위험',
+  'CRITICAL': '매우위험'
+}
+
+// 한글 점수를 영문으로 매핑 (정적 규칙용)
+const SCORE_MAPPING_REVERSE: Record<PhishingScore, PhishingScoreEn> = {
+  '안전': 'SAFE',
+  '낮음': 'LOW',
+  '보통': 'MEDIUM', 
+  '위험': 'HIGH',
+  '매우위험': 'CRITICAL'
+}
 
 export const runtime = 'edge'
 
@@ -62,45 +80,45 @@ export async function POST(request: NextRequest) {
     // 정적 규칙 적용
     const staticHighlights = applyStaticRules(body.content)
 
-    // OpenAI function call
+    // OpenAI function call (영문으로 호출하여 토큰 절약)
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       temperature: 0,
       messages: [
         {
           role: 'system',
-          content: `당신은 피싱 이메일/URL 분석 전문가입니다. 다음 기준으로 분석하세요:
+          content: `You are a phishing email/URL analyzer. Analyze based on these criteria:
 
-1. 의심스러운 도메인, 링크, 첨부파일
-2. 긴급성을 조작하는 언어 패턴
-3. 개인정보나 금융정보 요구
-4. 발신자 위장 시도
-5. 맞춤법, 문법 오류
-6. 사회공학적 기법 사용
+1. Suspicious domains, links, attachments
+2. Urgency manipulation language patterns  
+3. Personal/financial information requests
+4. Sender spoofing attempts
+5. Grammar/spelling errors
+6. Social engineering techniques
 
-점수 기준:
-- 매우위험: 확실한 피싱
-- 위험: 피싱 가능성 높음
-- 보통: 약간의 위험 요소
-- 낮음: 경미한 주의사항
-- 안전: 정상적인 이메일/URL`
+Scoring:
+- CRITICAL: Confirmed phishing
+- HIGH: Likely phishing  
+- MEDIUM: Some risk factors
+- LOW: Minor concerns
+- SAFE: Legitimate content`
         },
         {
           role: 'user',
-          content: `다음 ${body.type === 'email' ? '이메일' : 'URL'}을 분석해주세요:\n\n${body.content}`
+          content: `Analyze this ${body.type === 'email' ? 'email' : 'URL'}:\n\n${body.content}`
         }
       ],
       functions: [
         {
           name: 'analyze_phishing',
-          description: '피싱 분석 결과를 반환합니다',
+          description: 'Return phishing analysis results',
           parameters: {
             type: 'object',
             properties: {
               score: {
                 type: 'string',
-                enum: ['안전', '낮음', '보통', '위험', '매우위험'],
-                description: '피싱 위험도 점수'
+                enum: ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+                description: 'Phishing risk score'
               },
               highlights: {
                 type: 'array',
@@ -109,20 +127,20 @@ export async function POST(request: NextRequest) {
                   properties: {
                     text: {
                       type: 'string',
-                      description: '의심스러운 텍스트'
+                      description: 'Suspicious text'
                     },
                     reason: {
                       type: 'string',
-                      description: '의심스러운 이유'
+                      description: 'Why suspicious'
                     }
                   },
                   required: ['text', 'reason']
                 },
-                description: '의심스러운 구간 목록'
+                description: 'List of suspicious elements'
               },
               summary: {
                 type: 'string',
-                description: '분석 요약'
+                description: 'Analysis summary'
               }
             },
             required: ['score', 'highlights', 'summary']
@@ -155,10 +173,12 @@ export async function POST(request: NextRequest) {
 
     // 최종 점수 계산 (정적 규칙과 AI 결과 중 더 높은 위험도 선택)
     const staticScore = getPhishingScore(staticHighlights)
-    const scoreOrder = ['안전', '낮음', '보통', '위험', '매우위험']
-    const aiScoreLevel = scoreOrder.indexOf(aiResult.score)
-    const staticScoreLevel = scoreOrder.indexOf(staticScore)
-    const finalScore = scoreOrder[Math.max(aiScoreLevel, staticScoreLevel)] as PhishingScore
+    const staticScoreEn = SCORE_MAPPING_REVERSE[staticScore]
+    const scoreOrderEn: PhishingScoreEn[] = ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+    const aiScoreLevel = scoreOrderEn.indexOf(aiResult.score as PhishingScoreEn)
+    const staticScoreLevel = scoreOrderEn.indexOf(staticScoreEn)
+    const finalScoreEn = scoreOrderEn[Math.max(aiScoreLevel, staticScoreLevel)]
+    const finalScore = SCORE_MAPPING[finalScoreEn]
 
     const result: AnalysisResult = {
       score: finalScore,

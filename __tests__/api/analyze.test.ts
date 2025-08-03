@@ -74,7 +74,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: '안전',
+              score: 'SAFE',
               highlights: [],
               summary: 'This content appears to be safe.'
             })
@@ -244,7 +244,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: '낮음',
+              score: 'LOW',
               highlights: [
                 { text: 'suspicious', reason: 'AI detected suspicious content' }
               ],
@@ -295,7 +295,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: '안전',
+              score: 'SAFE',
               highlights: [],
               summary: 'Safe content'
             })
@@ -312,7 +312,7 @@ describe('/api/analyze', () => {
       messages: expect.arrayContaining([
         expect.objectContaining({
           role: 'system',
-          content: expect.stringContaining('피싱 이메일/URL 분석 전문가')
+          content: expect.stringContaining('phishing email/URL analyzer')
         }),
         expect.objectContaining({
           role: 'user',
