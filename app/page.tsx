@@ -42,9 +42,8 @@ export default function Home() {
                   <h3 className="text-xl font-semibold">AI-Powered Analysis</h3>
                   <p className="text-muted-foreground">
                     Advanced language models powered by OpenAI GPT-4o
-                    accurately detect phishing patterns.
+                    accurately detect phishing patterns and provide detailed analysis.
                   </p>
-                  <Badge variant="secondary" aria-label="Accuracy rate">99.8% Accuracy</Badge>
                 </article>
                 
                 <article className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border" role="listitem">

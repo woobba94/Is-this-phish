@@ -59,7 +59,7 @@ export default function RootLayout({
                 <div className="flex gap-2" role="list" aria-label="Service highlights">
                   <Badge variant="secondary" className="gap-1" role="listitem">
                     <Shield className="w-3 h-3" aria-hidden="true" />
-                    99.8% Accuracy
+                    AI-Powered Detection
                   </Badge>
                   <Badge variant="outline" className="gap-1" role="listitem">
                     <span aria-hidden="true">⚡</span> 3-second Analysis
