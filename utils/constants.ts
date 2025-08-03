@@ -13,6 +13,13 @@ export const API_CONFIG = {
   CACHE_EXPIRY_DAYS: 7,
 } as const
 
+// Get the number of static rules dynamically
+export const getStaticRulesCount = () => {
+  // Import is done here to avoid circular dependency
+  const { STATIC_RULES } = require('./staticRules')
+  return STATIC_RULES.length
+}
+
 // Risk level configuration for UI display
 export const RISK_LEVELS = {
   Critical: {

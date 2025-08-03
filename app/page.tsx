@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import EmailAnalyzer from '@/components/EmailAnalyzer'
 import { RISK_LEVELS } from '@/utils/constants'
+import { STATIC_RULES } from '@/utils/staticRules'
 import { PhishingScore } from '@/utils/types'
 import { Bot, Zap, Shield, FileText, CheckCircle } from 'lucide-react'
 
@@ -71,7 +72,9 @@ export default function Home() {
                     Static security rules applied alongside AI analysis
                     provide more accurate risk assessment.
                   </p>
-                  <Badge variant="secondary" aria-label="Number of rules">7 Rules</Badge>
+                  <Badge variant="secondary" aria-label={`Number of rules: ${STATIC_RULES.length}`}>
+                    {STATIC_RULES.length} Rules
+                  </Badge>
                 </article>
               </div>
             </CardContent>

@@ -1,6 +1,6 @@
 import { StaticRule, PhishingHighlight, PhishingScore } from './types'
 
-const STATIC_RULES: StaticRule[] = [
+export const STATIC_RULES: StaticRule[] = [
   // 한글·영문 도메인 불일치
   {
     pattern: /from:.*@.*\.(kr|한국).*[\s\S]*https?:\/\/(?!.*\.(kr|한국))/gi,
