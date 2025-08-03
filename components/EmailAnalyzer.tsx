@@ -253,11 +253,38 @@ export default function EmailAnalyzer() {
         </section>
       )}
 
-      {/* Footer with PoweredBy */}
-      <footer className="text-center py-6 border-t">
-        <Badge variant="secondary" className="text-base px-4 py-2">
-          🤖 Powered by OpenAI GPT-4o
-        </Badge>
+      {/* Footer with Statistics */}
+      <footer className="border-t py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Global Phishing Statistics */}
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold text-foreground mb-4">Global Phishing Threat</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-red-600">3.4B</div>
+                <div className="text-base text-muted-foreground">phishing emails sent daily worldwide</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-orange-600">40%</div>
+                <div className="text-base text-muted-foreground">increase in global phishing attacks in 2024</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-yellow-600">83%</div>
+                <div className="text-base text-muted-foreground">of organizations experienced phishing attacks</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Separator */}
+          <Separator className="my-6" />
+          
+          {/* Powered By */}
+          <div className="text-center">
+            <Badge variant="secondary" className="text-base px-4 py-2">
+              🤖 Powered by OpenAI GPT-4o
+            </Badge>
+          </div>
+        </div>
       </footer>
     </div>
   )
