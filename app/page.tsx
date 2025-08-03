@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import EmailAnalyzer from '@/components/EmailAnalyzer'
 import { RISK_LEVELS } from '@/utils/constants'
 import { PhishingScore } from '@/utils/types'
@@ -29,9 +30,11 @@ export default function Home() {
           <CardContent>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border">
-                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto">
-                  <Bot className="w-8 h-8 text-white" />
-                </div>
+                <Avatar className="w-16 h-16 mx-auto bg-blue-500">
+                  <AvatarFallback className="bg-blue-500 text-white">
+                    <Bot className="w-8 h-8" />
+                  </AvatarFallback>
+                </Avatar>
                 <h3 className="text-xl font-semibold">AI-Powered Analysis</h3>
                 <p className="text-muted-foreground">
                   Advanced language models powered by OpenAI GPT-4o
@@ -41,9 +44,11 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
+                <Avatar className="w-16 h-16 mx-auto bg-green-500">
+                  <AvatarFallback className="bg-green-500 text-white">
+                    <Zap className="w-8 h-8" />
+                  </AvatarFallback>
+                </Avatar>
                 <h3 className="text-xl font-semibold">Real-time Analysis</h3>
                 <p className="text-muted-foreground">
                   Analysis completed within 3 seconds to support
@@ -53,9 +58,11 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50 border">
-                <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto">
-                  <Shield className="w-8 h-8 text-white" />
-                </div>
+                <Avatar className="w-16 h-16 mx-auto bg-purple-500">
+                  <AvatarFallback className="bg-purple-500 text-white">
+                    <Shield className="w-8 h-8" />
+                  </AvatarFallback>
+                </Avatar>
                 <h3 className="text-xl font-semibold">Combined Static Rules</h3>
                 <p className="text-muted-foreground">
                   Static security rules applied alongside AI analysis
@@ -83,9 +90,9 @@ export default function Home() {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Badge variant="default" className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl font-bold">
                   1
-                </div>
+                </Badge>
                 <div className="space-y-2">
                   <h3 className="font-semibold">Select Analysis Type</h3>
                   <p className="text-sm text-muted-foreground">
@@ -95,9 +102,9 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Badge variant="default" className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl font-bold">
                   2
-                </div>
+                </Badge>
                 <div className="space-y-2">
                   <h3 className="font-semibold">Enter Content</h3>
                   <p className="text-sm text-muted-foreground">
@@ -107,9 +114,9 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Badge variant="default" className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl font-bold">
                   3
-                </div>
+                </Badge>
                 <div className="space-y-2">
                   <h3 className="font-semibold">Run Analysis</h3>
                   <p className="text-sm text-muted-foreground">
@@ -119,9 +126,9 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Badge variant="default" className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl font-bold">
                   4
-                </div>
+                </Badge>
                 <div className="space-y-2">
                   <h3 className="font-semibold">Review Results & Share</h3>
                   <p className="text-sm text-muted-foreground">

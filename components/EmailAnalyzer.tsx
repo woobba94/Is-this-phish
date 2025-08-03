@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import AnalysisResult from './AnalysisResult'
 import { AnalyzeRequest, AnalyzeResponse } from '@/utils/types'
 import { API_CONFIG } from '@/utils/constants'
-import { Mail, Link, Search, RotateCcw, AlertTriangle, Shield } from 'lucide-react'
+import { Mail, Link, Search, RotateCcw, AlertTriangle, Shield, Loader2 } from 'lucide-react'
 
 // Input type configuration
 const INPUT_TYPES = {
@@ -98,7 +98,7 @@ export default function EmailAnalyzer() {
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3 mb-6">
           <Shield className="w-12 h-12 text-primary" />
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-foreground">
             Is This Phish?
           </h1>
         </div>
@@ -178,7 +178,7 @@ export default function EmailAnalyzer() {
             >
               {isAnalyzing ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Analyzing...
                 </>
               ) : (
