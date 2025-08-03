@@ -1,22 +1,20 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 
 describe('rateLimit utils', () => {
-  const originalEnv = process.env
-
   beforeEach(() => {
-    // 각 테스트 전에 환경변수 초기화
-    process.env = { ...originalEnv }
+    // 각 테스트 전에 환경변수 모킹 초기화
+    vi.resetAllMocks()
   })
 
-  afterAll(() => {
-    // 테스트 완료 후 원래 환경변수 복원
-    process.env = originalEnv
+  afterEach(() => {
+    // 각 테스트 후에 환경변수 모킹 정리
+    vi.unstubAllEnvs()
   })
 
   describe('checkRateLimit', () => {
     it('프로덕션 환경에서 첫 번째 요청은 허용되어야 함', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       const result = checkRateLimit('192.168.1.1')
       
       expect(result.allowed).toBe(true)
@@ -25,17 +23,17 @@ describe('rateLimit utils', () => {
     })
 
     it('프로덕션 환경에서 두 번째 요청은 거부되어야 함', () => {
-      process.env.NODE_ENV = 'production'
-      checkRateLimit('192.168.1.1') // 첫 번째 요청
-      const result = checkRateLimit('192.168.1.1') // 두 번째 요청
+      vi.stubEnv('NODE_ENV', 'production')
+      checkRateLimit('192.168.1.2') // 첫 번째 요청 (다른 IP 사용)
+      const result = checkRateLimit('192.168.1.2') // 두 번째 요청
       
       expect(result.allowed).toBe(false)
       expect(result.remaining).toBe(0)
     })
 
     it('개발 환경에서 로컬 IP는 더 많은 요청 허용', () => {
-      process.env.NODE_ENV = 'development'
-      process.env.ALLOW_DEV_MODE = 'true'
+      vi.stubEnv('NODE_ENV', 'development')
+      vi.stubEnv('ALLOW_DEV_MODE', 'true')
       
       const result = checkRateLimit('127.0.0.1')
       
@@ -44,36 +42,37 @@ describe('rateLimit utils', () => {
     })
 
     it('개발 환경이어도 로컬 IP가 아니면 프로덕션 제한 적용', () => {
-      process.env.NODE_ENV = 'development'
-      process.env.ALLOW_DEV_MODE = 'true'
+      vi.stubEnv('NODE_ENV', 'development')
+      vi.stubEnv('ALLOW_DEV_MODE', 'true')
       
-      const result = checkRateLimit('192.168.1.1')
+      const result = checkRateLimit('192.168.1.3')
       
       expect(result.allowed).toBe(true)
       expect(result.remaining).toBe(0) // 로컬 IP가 아니므로 1회 제한
     })
 
     it('ALLOW_DEV_MODE가 false면 개발환경에서도 프로덕션 제한 적용', () => {
-      process.env.NODE_ENV = 'development'
-      process.env.ALLOW_DEV_MODE = 'false'
+      vi.stubEnv('NODE_ENV', 'development')
+      vi.stubEnv('ALLOW_DEV_MODE', 'false')
       
-      const result = checkRateLimit('127.0.0.1')
+      // 다른 테스트와 충돌하지 않도록 다른 IP 사용
+      const result = checkRateLimit('127.0.0.2')
       
       expect(result.allowed).toBe(true)
       expect(result.remaining).toBe(0) // DEV_MODE가 비활성화되어 1회 제한
     })
 
     it('다른 IP는 독립적으로 처리되어야 함', () => {
-      process.env.NODE_ENV = 'production'
-      checkRateLimit('192.168.1.1') // 첫 번째 IP에서 요청
-      const result = checkRateLimit('192.168.1.2') // 다른 IP에서 요청
+      vi.stubEnv('NODE_ENV', 'production')
+      checkRateLimit('192.168.1.4') // 첫 번째 IP에서 요청
+      const result = checkRateLimit('192.168.1.5') // 다른 IP에서 요청
       
       expect(result.allowed).toBe(true)
       expect(result.remaining).toBe(0)
     })
 
     it('rate limit 정보가 올바르게 반환되어야 함', () => {
-      process.env.NODE_ENV = 'production'
+      vi.stubEnv('NODE_ENV', 'production')
       const result = checkRateLimit('192.168.1.6')
       
       expect(result).toHaveProperty('allowed')
