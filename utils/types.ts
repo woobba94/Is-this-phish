@@ -1,5 +1,4 @@
 export type PhishingScore = 'Safe' | 'Low' | 'Medium' | 'High' | 'Critical'
-export type PhishingScoreEn = 'SAFE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 
 export interface PhishingHighlight {
   text: string
@@ -21,6 +20,7 @@ export interface AnalyzeResponse {
   success: boolean
   result?: AnalysisResult
   error?: string
+  cached?: boolean
 }
 
 export interface StaticRule {

@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { PhishingScore } from '@/utils/types'
+import { RISK_LEVELS } from '@/utils/constants'
 import { ShieldAlert, AlertTriangle, Info, ShieldCheck } from 'lucide-react'
 
 interface PhishingBadgeProps {
@@ -9,58 +10,49 @@ interface PhishingBadgeProps {
   className?: string
 }
 
-const SCORE_CONFIG = {
-  Critical: { 
-    label: 'Critical', 
-    variant: 'phishingA' as const,
-    icon: ShieldAlert,
-    description: 'Confirmed phishing detected'
-  },
-  High: { 
-    label: 'High', 
-    variant: 'phishingB' as const,
-    icon: ShieldAlert,
-    description: 'High phishing possibility'
-  },
-  Medium: { 
-    label: 'Medium', 
-    variant: 'phishingC' as const,
-    icon: AlertTriangle,
-    description: 'Some risk factors present'
-  },
-  Low: { 
-    label: 'Low', 
-    variant: 'phishingD' as const,
-    icon: Info,
-    description: 'Minor concerns'
-  },
-  Safe: { 
-    label: 'Safe', 
-    variant: 'phishingF' as const,
-    icon: ShieldCheck,
-    description: 'Normal email/URL'
-  },
+const getIconForScore = (score: PhishingScore) => {
+  switch (score) {
+    case 'Critical':
+    case 'High':
+      return ShieldAlert
+    case 'Medium':
+      return AlertTriangle
+    case 'Low':
+      return Info
+    case 'Safe':
+      return ShieldCheck
+    default:
+      return ShieldCheck
+  }
 }
 
 export default function PhishingBadge({ score, className = '' }: PhishingBadgeProps) {
-  const config = SCORE_CONFIG[score]
+  const config = RISK_LEVELS[score]
   
   if (!config) {
     console.error(`Invalid score: ${score}`)
     return null
   }
   
-  const IconComponent = config.icon
+  const IconComponent = getIconForScore(score)
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <Badge variant={config.variant} className={`text-lg px-6 py-3 gap-2 ${className}`}>
+    <div className="flex flex-col items-center gap-3">
+      <Badge 
+        variant={config.variant} 
+        className={`text-lg px-6 py-3 gap-2 shadow-lg hover:shadow-xl transition-all duration-200 ${className}`}
+      >
         <IconComponent className="w-5 h-5" />
         <span className="font-bold text-xl">{score}</span>
       </Badge>
-      <p className="text-xs text-muted-foreground text-center max-w-[200px]">
-        {config.description}
-      </p>
+      <div className="text-center space-y-1">
+        <p className="text-sm font-medium text-foreground">
+          {config.label} Risk
+        </p>
+        <p className="text-xs text-muted-foreground max-w-[200px]">
+          {config.description}
+        </p>
+      </div>
     </div>
   )
 } 

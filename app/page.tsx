@@ -2,9 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import EmailAnalyzer from '@/components/EmailAnalyzer'
+import { RISK_LEVELS } from '@/utils/constants'
+import { PhishingScore } from '@/utils/types'
 import { Bot, Zap, Shield, FileText, CheckCircle } from 'lucide-react'
 
 export default function Home() {
+  const riskLevelOrder: PhishingScore[] = ['Critical', 'High', 'Medium', 'Low', 'Safe']
+  
   return (
     <div className="min-h-screen">
       <EmailAnalyzer />
@@ -121,7 +125,7 @@ export default function Home() {
                 <div className="space-y-2">
                   <h3 className="font-semibold">Review Results & Share</h3>
                   <p className="text-sm text-muted-foreground">
-                    Check risk level graded A-F and save as image to share.
+                    Check risk level and save as image to share with others.
                   </p>
                 </div>
               </div>
@@ -139,70 +143,34 @@ export default function Home() {
               Risk Levels
             </CardTitle>
             <CardDescription className="text-lg">
-              Phishing risk levels are intuitively displayed with A-F grades
+              Phishing risk levels are clearly categorized into 5 levels
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card className="border-l-4 border-red-500 bg-red-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-red-500 text-white text-lg px-3 py-1">A</Badge>
-                  <div>
-                    <div className="font-semibold text-red-800">Critical</div>
-                    <div className="text-red-600 text-sm">Confirmed phishing detected</div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-orange-500 bg-orange-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-orange-500 text-white text-lg px-3 py-1">B</Badge>
-                  <div>
-                    <div className="font-semibold text-orange-800">High</div>
-                    <div className="text-orange-600 text-sm">High phishing possibility</div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-yellow-500 bg-yellow-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-yellow-500 text-white text-lg px-3 py-1">C</Badge>
-                  <div>
-                    <div className="font-semibold text-yellow-800">Medium</div>
-                    <div className="text-yellow-600 text-sm">Some suspicious elements present</div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-green-500 bg-green-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-green-500 text-white text-lg px-3 py-1">D</Badge>
-                  <div>
-                    <div className="font-semibold text-green-800">Low</div>
-                    <div className="text-green-600 text-sm">Minor risk factors</div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-cyan-500 bg-cyan-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-cyan-500 text-white text-lg px-3 py-1">E</Badge>
-                  <div>
-                    <div className="font-semibold text-cyan-800">Low</div>
-                    <div className="text-cyan-600 text-sm">Minor concerns</div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-blue-500 bg-blue-50/50">
-                <CardContent className="flex items-center gap-4 pt-6">
-                  <Badge className="bg-blue-500 text-white text-lg px-3 py-1">F</Badge>
-                  <div>
-                    <div className="font-semibold text-blue-800">Safe</div>
-                    <div className="text-blue-600 text-sm">Normal email/URL</div>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {riskLevelOrder.map((level, index) => {
+                const config = RISK_LEVELS[level]
+                return (
+                  <Card 
+                    key={level} 
+                    className={`border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                  >
+                    <CardContent className="flex items-center gap-4 pt-6">
+                      <Badge className={`bg-${config.color}-500 text-white text-lg px-4 py-2 font-bold`}>
+                        {level}
+                      </Badge>
+                      <div>
+                        <div className={`font-semibold ${config.textColor}`}>
+                          {config.label} Risk
+                        </div>
+                        <div className={`text-sm ${config.subtextColor}`}>
+                          {config.description}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </CardContent>
         </Card>

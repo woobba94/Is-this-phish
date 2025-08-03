@@ -2,32 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 import { applyStaticRules, getPhishingScore } from '@/utils/staticRules'
-import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore, PhishingScoreEn } from '@/utils/types'
+import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore } from '@/utils/types'
 import { getCachedResult, setCachedResult, isValidUrl } from '@/utils/urlCache'
+import { API_CONFIG, OPENAI_FUNCTION_DEFINITION } from '@/utils/constants'
+import { getHigherRiskScore } from '@/utils/scoreUtils'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
-
-const MAX_CONTENT_SIZE = 20 * 1024 // 20KB
-
-// 영문 점수를 한글로 매핑
-const SCORE_MAPPING: Record<PhishingScoreEn, PhishingScore> = {
-  'SAFE': 'Safe',
-  'LOW': 'Low', 
-  'MEDIUM': 'Medium',
-  'HIGH': 'High',
-  'CRITICAL': 'Critical'
-}
-
-// 한글 점수를 영문으로 매핑 (정적 규칙용)
-const SCORE_MAPPING_REVERSE: Record<PhishingScore, PhishingScoreEn> = {
-  'Safe': 'SAFE',
-  'Low': 'LOW',
-  'Medium': 'MEDIUM', 
-  'High': 'HIGH',
-  'Critical': 'CRITICAL'
-}
 
 export const runtime = 'edge'
 
@@ -42,8 +24,8 @@ export async function POST(request: NextRequest) {
       const isDev = process.env.NODE_ENV === 'development' || 
                    process.env.ALLOW_DEV_MODE === 'true'
       const errorMessage = isDev 
-        ? 'Development environment daily request limit (50 requests) exceeded. Please try again in 24 hours.'
-        : 'Daily request limit (10 requests) exceeded. Please try again in 24 hours.'
+        ? `Development environment daily request limit (${API_CONFIG.RATE_LIMIT.DEVELOPMENT} requests) exceeded. Please try again in 24 hours.`
+        : `Daily request limit (${API_CONFIG.RATE_LIMIT.DEFAULT} requests) exceeded. Please try again in 24 hours.`
       
       return NextResponse.json(
         { 
@@ -71,9 +53,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (body.content.length > MAX_CONTENT_SIZE) {
+    if (body.content.length > API_CONFIG.MAX_CONTENT_SIZE) {
       return NextResponse.json(
-        { success: false, error: 'Input size exceeds 20KB limit.' },
+        { success: false, error: `Input size exceeds ${API_CONFIG.MAX_CONTENT_SIZE / 1024}KB limit.` },
         { status: 400 }
       )
     }
@@ -122,56 +104,18 @@ export async function POST(request: NextRequest) {
 6. Social engineering techniques
 
 Scoring:
-- CRITICAL: Confirmed phishing
-- HIGH: Likely phishing  
-- MEDIUM: Some risk factors
-- LOW: Minor concerns
-- SAFE: Legitimate content`
+- Critical: Confirmed phishing
+- High: Likely phishing  
+- Medium: Some risk factors
+- Low: Minor concerns
+- Safe: Legitimate content`
         },
         {
           role: 'user',
           content: `Analyze this ${body.type === 'email' ? 'email' : 'URL'}:\n\n${body.content}`
         }
       ],
-      functions: [
-        {
-          name: 'analyze_phishing',
-          description: 'Return phishing analysis results',
-          parameters: {
-            type: 'object',
-            properties: {
-              score: {
-                type: 'string',
-                enum: ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
-                description: 'Phishing risk score'
-              },
-              highlights: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    text: {
-                      type: 'string',
-                      description: 'Suspicious text'
-                    },
-                    reason: {
-                      type: 'string',
-                      description: 'Why suspicious'
-                    }
-                  },
-                  required: ['text', 'reason']
-                },
-                description: 'List of suspicious elements'
-              },
-              summary: {
-                type: 'string',
-                description: 'Analysis summary'
-              }
-            },
-            required: ['score', 'highlights', 'summary']
-          }
-        }
-      ],
+      functions: [OPENAI_FUNCTION_DEFINITION],
       function_call: { name: 'analyze_phishing' }
     })
 
@@ -198,12 +142,7 @@ Scoring:
 
     // 최종 점수 계산 (정적 규칙과 AI 결과 중 더 높은 위험도 선택)
     const staticScore = getPhishingScore(staticHighlights)
-    const staticScoreEn = SCORE_MAPPING_REVERSE[staticScore]
-    const scoreOrderEn: PhishingScoreEn[] = ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
-    const aiScoreLevel = scoreOrderEn.indexOf(aiResult.score as PhishingScoreEn)
-    const staticScoreLevel = scoreOrderEn.indexOf(staticScoreEn)
-    const finalScoreEn = scoreOrderEn[Math.max(aiScoreLevel, staticScoreLevel)]
-    const finalScore = SCORE_MAPPING[finalScoreEn]
+    const finalScore = getHigherRiskScore(staticScore, aiResult.score as PhishingScore)
 
     const result: AnalysisResult = {
       score: finalScore,

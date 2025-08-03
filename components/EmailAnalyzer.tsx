@@ -9,7 +9,33 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import AnalysisResult from './AnalysisResult'
 import { AnalyzeRequest, AnalyzeResponse } from '@/utils/types'
+import { API_CONFIG } from '@/utils/constants'
 import { Mail, Link, Search, RotateCcw, AlertTriangle, Shield } from 'lucide-react'
+
+// Input type configuration
+const INPUT_TYPES = {
+  email: {
+    label: 'Email Analysis',
+    icon: Mail,
+    placeholder: `Please paste the complete email content...
+
+Example:
+From: sender@example.com
+Subject: Urgent - Account Verification Required
+
+Hello. Please verify your account immediately for security...`,
+    fieldLabel: 'Email Content (HTML/Plain Text)'
+  },
+  url: {
+    label: 'URL Analysis',
+    icon: Link,
+    placeholder: `Please enter the URL...
+
+Example:
+https://suspicious-site.com/login?user=...`,
+    fieldLabel: 'Suspicious URL'
+  }
+} as const
 
 export default function EmailAnalyzer() {
   const [inputType, setInputType] = useState<'email' | 'url'>('email')
@@ -62,6 +88,10 @@ export default function EmailAnalyzer() {
     setResult(null)
   }
 
+  const currentConfig = INPUT_TYPES[inputType]
+  const isContentValid = content.trim().length > 0
+  const isNearSizeLimit = content.length > API_CONFIG.MAX_CONTENT_SIZE * 0.75
+
   return (
     <div className="container mx-auto max-w-6xl space-y-8 p-4">
       {/* 메인 헤더 */}
@@ -96,58 +126,43 @@ export default function EmailAnalyzer() {
         <CardContent className="space-y-6">
           {/* 입력 타입 선택 */}
           <div className="flex justify-center gap-2">
-            <Button
-              variant={inputType === 'email' ? 'default' : 'outline'}
-              onClick={() => setInputType('email')}
-              className="gap-2"
-            >
-              <Mail className="w-4 h-4" />
-              Email Analysis
-            </Button>
-            <Button
-              variant={inputType === 'url' ? 'default' : 'outline'}
-              onClick={() => setInputType('url')}
-              className="gap-2"
-            >
-              <Link className="w-4 h-4" />
-              URL Analysis
-            </Button>
+            {Object.entries(INPUT_TYPES).map(([type, config]) => {
+              const IconComponent = config.icon
+              return (
+                <Button
+                  key={type}
+                  variant={inputType === type ? 'default' : 'outline'}
+                  onClick={() => setInputType(type as 'email' | 'url')}
+                  className="gap-2"
+                >
+                  <IconComponent className="w-4 h-4" />
+                  {config.label}
+                </Button>
+              )
+            })}
           </div>
 
           {/* 입력 영역 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">
-                {inputType === 'email' ? 'Email Content (HTML/Plain Text)' : 'Suspicious URL'}
+                {currentConfig.fieldLabel}
               </label>
               <Badge variant="outline" className="text-xs">
-                Max 20KB
+                Max {API_CONFIG.MAX_CONTENT_SIZE / 1024}KB
               </Badge>
             </div>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={
-                inputType === 'email'
-                  ? `Please paste the complete email content...
-
-Example:
-From: sender@example.com
-Subject: Urgent - Account Verification Required
-
-Hello. Please verify your account immediately for security...`
-                  : `Please enter the URL...
-
-Example:
-https://suspicious-site.com/login?user=...`
-              }
+              placeholder={currentConfig.placeholder}
               className="min-h-[200px] resize-none"
-              maxLength={20480}
+              maxLength={API_CONFIG.MAX_CONTENT_SIZE}
             />
             <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>{content.length} / 20,480 characters</span>
+              <span>{content.length.toLocaleString()} / {API_CONFIG.MAX_CONTENT_SIZE.toLocaleString()} characters</span>
               <span className="text-xs">
-                {content.length > 15000 && '⚠️ Approaching size limit'}
+                {isNearSizeLimit && '⚠️ Approaching size limit'}
               </span>
             </div>
           </div>
@@ -156,7 +171,7 @@ https://suspicious-site.com/login?user=...`
           <div className="flex gap-3">
             <Button
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !content.trim()}
+              disabled={isAnalyzing || !isContentValid}
               className="flex-1 gap-2"
               size="lg"
               variant="destructive"

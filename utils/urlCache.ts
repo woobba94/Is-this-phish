@@ -1,5 +1,6 @@
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
 import { AnalysisResult } from './types'
+import { API_CONFIG } from './constants'
 
 // URL을 SHA-256으로 해시화 (프라이버시 보호) - Web Crypto API 사용
 export async function hashUrl(url: string): Promise<string> {
@@ -69,7 +70,7 @@ export async function setCachedResult(url: string, result: AnalysisResult): Prom
   try {
     const urlHash = await hashUrl(url)
     const domain = extractDomain(url)
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7일 후 만료
+    const expiresAt = new Date(Date.now() + API_CONFIG.CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
     
     const { error } = await supabaseAdmin
       .from('url_cache')

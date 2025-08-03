@@ -15,12 +15,19 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        phishingA: "border-transparent bg-red-500 text-white hover:bg-red-600",
-        phishingB: "border-transparent bg-orange-500 text-white hover:bg-orange-600",
-        phishingC: "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
-        phishingD: "border-transparent bg-green-500 text-white hover:bg-green-600",
-        phishingE: "border-transparent bg-cyan-500 text-white hover:bg-cyan-600",
-        phishingF: "border-transparent bg-blue-500 text-white hover:bg-blue-600",
+        warning:
+          "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
+        // Phishing score specific variants
+        phishingA:
+          "border-transparent bg-red-500 text-white hover:bg-red-600 shadow-lg",
+        phishingB:
+          "border-transparent bg-orange-500 text-white hover:bg-orange-600 shadow-lg",
+        phishingC:
+          "border-transparent bg-yellow-500 text-white hover:bg-yellow-600 shadow-lg",
+        phishingD:
+          "border-transparent bg-blue-500 text-white hover:bg-blue-600 shadow-lg",
+        phishingF:
+          "border-transparent bg-green-500 text-white hover:bg-green-600 shadow-lg",
       },
     },
     defaultVariants: {
