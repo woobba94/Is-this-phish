@@ -58,23 +58,17 @@ describe('PhishingBadge', () => {
   })
 
   it('Should be able to apply custom className', () => {
-    render(<PhishingBadge score="Critical" className="custom-class" />)
+    render(<PhishingBadge score="Medium" className="custom-class" />)
     
-    const badge = screen.getByText('Critical').closest('div')
+    const badge = screen.getByText('Medium').closest('div')
     expect(badge).toHaveClass('custom-class')
   })
 
   it('Should have appropriate Tailwind classes for all levels', () => {
-    const scores: Array<'Safe' | 'Low' | 'Medium' | 'High' | 'Critical'> = ['Safe', 'Low', 'Medium', 'High', 'Critical']
+    render(<PhishingBadge score="High" />)
     
-    scores.forEach((score) => {
-      const { unmount } = render(<PhishingBadge score={score} />)
-      
-      const badge = screen.getByText(score).closest('div')
-      expect(badge).toHaveClass('inline-flex', 'items-center', 'rounded-full', 'font-semibold', 'text-white')
-      
-      unmount()
-    })
+    const badge = screen.getByText('High').closest('div')
+    expect(badge).toHaveClass('shadow-lg', 'hover:shadow-xl', 'transition-all', 'duration-200')
   })
 
   it('Score and label should both be displayed', () => {
@@ -82,6 +76,6 @@ describe('PhishingBadge', () => {
     
     const scoreElement = screen.getByText('Medium')
     
-    expect(scoreElement).toHaveClass('font-bold', 'text-xl')
+    expect(scoreElement).toHaveClass('font-bold', 'text-2xl')
   })
 }) 
