@@ -19,7 +19,7 @@ export default function EmailAnalyzer() {
 
   const handleAnalyze = async () => {
     if (!content.trim()) {
-      alert('분석할 내용을 입력해주세요.')
+      alert('Please enter content to analyze.')
       return
     }
 
@@ -50,7 +50,7 @@ export default function EmailAnalyzer() {
       console.error('Request failed:', error)
       setResult({
         success: false,
-        error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        error: 'A network error occurred. Please try again.',
       })
     } finally {
       setIsAnalyzing(false)
@@ -73,10 +73,10 @@ export default function EmailAnalyzer() {
           </h1>
         </div>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          AI와 정적 규칙을 결합한 실시간 피싱 탐지 서비스
+          Real-time phishing detection service combining AI and static rules
         </p>
         <Badge variant="secondary" className="text-sm">
-          🤖 OpenAI GPT-4o 기반 분석
+          🤖 Powered by OpenAI GPT-4o
         </Badge>
       </div>
 
@@ -87,10 +87,10 @@ export default function EmailAnalyzer() {
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <Search className="w-6 h-6" />
-            피싱 분석
+            Phishing Analysis
           </CardTitle>
           <CardDescription>
-            의심스러운 이메일이나 URL을 분석하여 위험도를 평가합니다
+            Analyze suspicious emails or URLs to assess risk levels
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -102,7 +102,7 @@ export default function EmailAnalyzer() {
               className="gap-2"
             >
               <Mail className="w-4 h-4" />
-              이메일 분석
+              Email Analysis
             </Button>
             <Button
               variant={inputType === 'url' ? 'default' : 'outline'}
@@ -110,7 +110,7 @@ export default function EmailAnalyzer() {
               className="gap-2"
             >
               <Link className="w-4 h-4" />
-              URL 분석
+              URL Analysis
             </Button>
           </div>
 
@@ -118,10 +118,10 @@ export default function EmailAnalyzer() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">
-                {inputType === 'email' ? '이메일 원문 (HTML/Plain Text)' : '의심스러운 URL'}
+                {inputType === 'email' ? 'Email Content (HTML/Plain Text)' : 'Suspicious URL'}
               </label>
               <Badge variant="outline" className="text-xs">
-                최대 20KB
+                Max 20KB
               </Badge>
             </div>
             <Textarea
@@ -129,25 +129,25 @@ export default function EmailAnalyzer() {
               onChange={(e) => setContent(e.target.value)}
               placeholder={
                 inputType === 'email'
-                  ? `이메일의 전체 내용을 붙여넣어 주세요...
+                  ? `Please paste the complete email content...
 
-예시:
+Example:
 From: sender@example.com
-Subject: 긴급 - 계정 확인 필요
+Subject: Urgent - Account Verification Required
 
-안녕하세요. 보안을 위해 즉시 계정을 확인해주세요...`
-                  : `URL을 입력해주세요...
+Hello. Please verify your account immediately for security...`
+                  : `Please enter the URL...
 
-예시:
+Example:
 https://suspicious-site.com/login?user=...`
               }
               className="min-h-[200px] resize-none"
               maxLength={20480}
             />
             <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>{content.length} / 20,480 글자</span>
+              <span>{content.length} / 20,480 characters</span>
               <span className="text-xs">
-                {content.length > 15000 && '⚠️ 크기 제한에 근접했습니다'}
+                {content.length > 15000 && '⚠️ Approaching size limit'}
               </span>
             </div>
           </div>
@@ -164,12 +164,12 @@ https://suspicious-site.com/login?user=...`
               {isAnalyzing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  분석 중...
+                  Analyzing...
                 </>
               ) : (
                 <>
                   <Search className="w-4 h-4" />
-                  피싱 분석 시작
+                  Start Analysis
                 </>
               )}
             </Button>
@@ -181,18 +181,18 @@ https://suspicious-site.com/login?user=...`
               className="gap-2"
             >
               <RotateCcw className="w-4 h-4" />
-              초기화
+              Clear
             </Button>
           </div>
 
           {/* 주의사항 */}
           <Alert variant="warning">
             <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>주의사항</AlertTitle>
+            <AlertTitle>Important Notes</AlertTitle>
             <AlertDescription className="space-y-1 mt-2">
-              <div>• IP당 하루 1회 분석 가능합니다</div>
-              <div>• 개인정보가 포함된 내용은 주의해서 입력해주세요</div>
-              <div>• 분석 결과는 참고용이며, 최종 판단은 사용자가 해야 합니다</div>
+              <div>• One analysis per IP address per day</div>
+              <div>• Please be careful when entering content with personal information</div>
+              <div>• Analysis results are for reference only, final judgment should be made by the user</div>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -206,9 +206,9 @@ https://suspicious-site.com/login?user=...`
           ) : (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>분석 실패</AlertTitle>
+              <AlertTitle>Analysis Failed</AlertTitle>
               <AlertDescription>
-                {result.error || '알 수 없는 오류가 발생했습니다.'}
+                {result.error || 'An unknown error occurred.'}
               </AlertDescription>
             </Alert>
           )}

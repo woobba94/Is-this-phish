@@ -3,60 +3,60 @@ import { render, screen } from '@testing-library/react'
 import PhishingBadge from '@/components/PhishingBadge'
 
 describe('PhishingBadge', () => {
-  it('매우위험 등급 뱃지를 올바르게 렌더링해야 함', () => {
-    render(<PhishingBadge score="매우위험" />)
+  it('Critical level badge should be rendered correctly', () => {
+    render(<PhishingBadge score="Critical" />)
     
-    expect(screen.getByText('매우위험')).toBeInTheDocument()
-    expect(screen.getByText('확실한 피싱으로 판단됨')).toBeInTheDocument()
+    expect(screen.getByText('Critical')).toBeInTheDocument()
+    expect(screen.getByText('Confirmed phishing detected')).toBeInTheDocument()
   })
 
-  it('위험 등급 뱃지를 올바르게 렌더링해야 함', () => {
-    render(<PhishingBadge score="위험" />)
+  it('High level badge should be rendered correctly', () => {
+    render(<PhishingBadge score="High" />)
     
-    expect(screen.getByText('위험')).toBeInTheDocument()
+    expect(screen.getByText('High')).toBeInTheDocument()
   })
 
-  it('보통 등급 뱃지를 올바르게 렌더링해야 함', () => {
-    render(<PhishingBadge score="보통" />)
+  it('Medium level badge should be rendered correctly', () => {
+    render(<PhishingBadge score="Medium" />)
     
-    expect(screen.getByText('보통')).toBeInTheDocument()
+    expect(screen.getByText('Medium')).toBeInTheDocument()
   })
 
-  it('낮음 등급 뱃지를 올바르게 렌더링해야 함', () => {
-    render(<PhishingBadge score="낮음" />)
+  it('Low level badge should be rendered correctly', () => {
+    render(<PhishingBadge score="Low" />)
     
-    expect(screen.getByText('낮음')).toBeInTheDocument()
+    expect(screen.getByText('Low')).toBeInTheDocument()
   })
 
-  it('안전 등급 뱃지를 올바르게 렌더링해야 함', () => {
-    render(<PhishingBadge score="안전" />)
+  it('Safe level badge should be rendered correctly', () => {
+    render(<PhishingBadge score="Safe" />)
     
-    expect(screen.getByText('안전')).toBeInTheDocument()
+    expect(screen.getByText('Safe')).toBeInTheDocument()
   })
 
-  it('매우위험 등급은 빨간색 배경을 가져야 함', () => {
-    render(<PhishingBadge score="매우위험" />)
+  it('Critical level should have red background', () => {
+    render(<PhishingBadge score="Critical" />)
     
-    const badge = screen.getByText('매우위험').closest('div')
+    const badge = screen.getByText('Critical').closest('div')
     expect(badge).toHaveClass('bg-red-500')
   })
 
-  it('안전 등급은 파란색 배경을 가져야 함', () => {
-    render(<PhishingBadge score="안전" />)
+  it('Safe level should have blue background', () => {
+    render(<PhishingBadge score="Safe" />)
     
-    const badge = screen.getByText('안전').closest('div')
+    const badge = screen.getByText('Safe').closest('div')
     expect(badge).toHaveClass('bg-blue-500')
   })
 
-  it('커스텀 className을 적용할 수 있어야 함', () => {
-    render(<PhishingBadge score="매우위험" className="custom-class" />)
+  it('Should be able to apply custom className', () => {
+    render(<PhishingBadge score="Critical" className="custom-class" />)
     
-    const badge = screen.getByText('매우위험').closest('div')
+    const badge = screen.getByText('Critical').closest('div')
     expect(badge).toHaveClass('custom-class')
   })
 
-  it('모든 등급에 대해 적절한 Tailwind 클래스를 가져야 함', () => {
-    const scores: Array<'안전' | '낮음' | '보통' | '위험' | '매우위험'> = ['안전', '낮음', '보통', '위험', '매우위험']
+  it('Should have appropriate Tailwind classes for all levels', () => {
+    const scores: Array<'Safe' | 'Low' | 'Medium' | 'High' | 'Critical'> = ['Safe', 'Low', 'Medium', 'High', 'Critical']
     
     scores.forEach((score) => {
       const { unmount } = render(<PhishingBadge score={score} />)
@@ -68,10 +68,10 @@ describe('PhishingBadge', () => {
     })
   })
 
-  it('점수와 라벨이 모두 표시되어야 함', () => {
-    render(<PhishingBadge score="보통" />)
+  it('Score and label should both be displayed', () => {
+    render(<PhishingBadge score="Medium" />)
     
-    const scoreElement = screen.getByText('보통')
+    const scoreElement = screen.getByText('Medium')
     
     expect(scoreElement).toHaveClass('font-bold', 'text-xl')
   })

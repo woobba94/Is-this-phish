@@ -66,7 +66,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('안전')
+    ;(getPhishingScore as any).mockReturnValue('Safe')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -88,7 +88,7 @@ describe('/api/analyze', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.result.score).toBe('안전')
+    expect(data.result.score).toBe('Safe')
   })
 
   it('rate limit 초과 시 429 에러를 반환해야 함', async () => {
@@ -198,7 +198,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('안전')
+    ;(getPhishingScore as any).mockReturnValue('Safe')
 
     // OpenAI mock - 에러 발생
     mockCreate.mockRejectedValue(new Error('OpenAI API Error'))
@@ -236,7 +236,7 @@ describe('/api/analyze', () => {
     ;(applyStaticRules as any).mockReturnValue([
       { text: 'bit.ly/test', reason: '단축 URL 사용' }
     ])
-    ;(getPhishingScore as any).mockReturnValue('보통')
+    ;(getPhishingScore as any).mockReturnValue('Medium')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -260,7 +260,7 @@ describe('/api/analyze', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.result.score).toBe('보통') // 더 위험한 점수 선택
+    expect(data.result.score).toBe('Medium') // 더 위험한 점수 선택
     expect(data.result.highlights).toHaveLength(2) // 정적 규칙 + AI 결과
   })
 
@@ -287,7 +287,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('안전')
+    ;(getPhishingScore as any).mockReturnValue('Safe')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({

@@ -13,20 +13,20 @@ const MAX_CONTENT_SIZE = 20 * 1024 // 20KB
 
 // 영문 점수를 한글로 매핑
 const SCORE_MAPPING: Record<PhishingScoreEn, PhishingScore> = {
-  'SAFE': '안전',
-  'LOW': '낮음', 
-  'MEDIUM': '보통',
-  'HIGH': '위험',
-  'CRITICAL': '매우위험'
+  'SAFE': 'Safe',
+  'LOW': 'Low', 
+  'MEDIUM': 'Medium',
+  'HIGH': 'High',
+  'CRITICAL': 'Critical'
 }
 
 // 한글 점수를 영문으로 매핑 (정적 규칙용)
 const SCORE_MAPPING_REVERSE: Record<PhishingScore, PhishingScoreEn> = {
-  '안전': 'SAFE',
-  '낮음': 'LOW',
-  '보통': 'MEDIUM', 
-  '위험': 'HIGH',
-  '매우위험': 'CRITICAL'
+  'Safe': 'SAFE',
+  'Low': 'LOW',
+  'Medium': 'MEDIUM', 
+  'High': 'HIGH',
+  'Critical': 'CRITICAL'
 }
 
 export const runtime = 'edge'
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
       const isDev = process.env.NODE_ENV === 'development' || 
                    process.env.ALLOW_DEV_MODE === 'true'
       const errorMessage = isDev 
-        ? '개발 환경 일일 요청 한도(50회)를 초과했습니다. 24시간 후 다시 시도해주세요.'
-        : '일일 요청 한도(10회)를 초과했습니다. 24시간 후 다시 시도해주세요.'
+        ? 'Development environment daily request limit (50 requests) exceeded. Please try again in 24 hours.'
+        : 'Daily request limit (10 requests) exceeded. Please try again in 24 hours.'
       
       return NextResponse.json(
         { 
@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
     // 입력 검증
     if (!body.content || typeof body.content !== 'string') {
       return NextResponse.json(
-        { success: false, error: '유효하지 않은 입력입니다.' },
+        { success: false, error: 'Invalid input provided.' },
         { status: 400 }
       )
     }
 
     if (body.content.length > MAX_CONTENT_SIZE) {
       return NextResponse.json(
-        { success: false, error: '입력 크기가 20KB를 초과했습니다.' },
+        { success: false, error: 'Input size exceeds 20KB limit.' },
         { status: 400 }
       )
     }
@@ -178,7 +178,7 @@ Scoring:
     const functionCall = completion.choices[0]?.message?.function_call
     if (!functionCall || !functionCall.arguments) {
       return NextResponse.json(
-        { success: false, error: 'AI 분석 중 오류가 발생했습니다.' },
+        { success: false, error: 'An error occurred during AI analysis.' },
         { status: 500 }
       )
     }
@@ -209,7 +209,7 @@ Scoring:
       score: finalScore,
       highlights: uniqueHighlights,
       summary: aiResult.summary + (staticHighlights.length > 0 ? 
-        `\n\n정적 규칙에서 ${staticHighlights.length}개의 추가 위험 요소를 발견했습니다.` : '')
+        `\n\nStatic rules detected ${staticHighlights.length} additional risk factors.` : '')
     }
 
     // URL인 경우 결과를 캐시에 저장
@@ -237,7 +237,7 @@ Scoring:
   } catch (error) {
     console.error('Analysis error:', error)
     return NextResponse.json(
-      { success: false, error: '서버 오류가 발생했습니다.' },
+      { success: false, error: 'A server error occurred.' },
       { status: 500 }
     )
   }

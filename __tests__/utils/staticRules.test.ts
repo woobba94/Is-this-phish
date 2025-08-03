@@ -73,41 +73,41 @@ describe('staticRules', () => {
   })
 
   describe('getPhishingScore', () => {
-    it('위험 요소가 많으면 매우위험 등급을 반환해야 함', () => {
+    it('높은 위험도 규칙들이 많이 매칭되면 매우위험 등급을 반환해야 함', () => {
       const highlights = [
-        { text: 'test1', reason: '한국 도메인에서 발신했으나 해외 도메인으로 연결' },
-        { text: 'test2', reason: 'HTML 폼이 해외 도메인으로 전송' },
-        { text: 'test3', reason: '금융 관련 내용에 단축 URL 사용' },
+        { text: 'test1', reason: 'Email from Korean domain but links to foreign domain' },
+        { text: 'test2', reason: 'HTML form submits to foreign domain' },
+        { text: 'test3', reason: 'Financial content with shortened URL' },
       ]
       
       const score = getPhishingScore(highlights)
-      expect(score).toBe('매우위험')
+      expect(score).toBe('Critical')
     })
 
     it('중간 정도 위험 요소가 있으면 위험-보통 등급을 반환해야 함', () => {
       const highlights = [
-        { text: 'test1', reason: '한국 도메인에서 발신했으나 해외 도메인으로 연결' },
-        { text: 'test2', reason: '퍼블릭 이메일에서 공식 업무 메일로 가장' },
+        { text: 'test1', reason: 'Email from Korean domain but links to foreign domain' },
+        { text: 'test2', reason: 'Using public email service for official business communication' },
       ]
       
       const score = getPhishingScore(highlights)
-      expect(['위험', '보통']).toContain(score)
+      expect(['High', 'Medium']).toContain(score)
     })
 
     it('위험 요소가 적으면 낮음 등급을 반환해야 함', () => {
       const highlights = [
-        { text: 'test1', reason: '퍼블릭 이메일에서 공식 업무 메일로 가장' },
+        { text: 'test1', reason: 'Using public email service for official business communication' },
       ]
       
       const score = getPhishingScore(highlights)
-      expect(score).toBe('낮음')
+      expect(score).toBe('Low')
     })
 
     it('위험 요소가 없으면 안전 등급을 반환해야 함', () => {
       const highlights: any[] = []
       
       const score = getPhishingScore(highlights)
-      expect(score).toBe('안전')
+      expect(score).toBe('Safe')
     })
   })
 }) 

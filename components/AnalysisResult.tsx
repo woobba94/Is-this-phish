@@ -66,8 +66,8 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
         }
       }, 'image/png')
     } catch (error) {
-      console.error('이미지 생성 실패:', error)
-      alert('이미지 생성에 실패했습니다.')
+      console.error('Image generation failed:', error)
+      alert('Failed to generate image.')
     }
   }
 
@@ -78,7 +78,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
         <CardHeader className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3">
             <Shield className="w-8 h-8 text-primary" />
-            <CardTitle className="text-3xl">피싱 분석 결과</CardTitle>
+            <CardTitle className="text-3xl">Phishing Analysis Result</CardTitle>
           </div>
           <div className="flex justify-center">
             <PhishingBadge score={result.score} />
@@ -90,7 +90,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
           <div className="space-y-3">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              분석 요약
+              Analysis Summary
             </h3>
             <Card className="bg-muted/50">
               <CardContent className="pt-6">
@@ -104,7 +104,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
           {/* 하이라이트된 컨텐츠 */}
           <div className="space-y-3">
             <h3 className="text-xl font-semibold">
-              원본 내용 (의심 구간 강조)
+              Original Content (Suspicious Parts Highlighted)
             </h3>
             <Card>
               <CardContent className="p-0">
@@ -125,9 +125,9 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
             <div className="space-y-4">
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-destructive" />
-                발견된 위험 요소
+                Risk Factors Found
                 <Badge variant="destructive" className="ml-2">
-                  {result.highlights.length}개
+                  {result.highlights.length} items
                 </Badge>
               </h3>
               <div className="grid gap-3">
@@ -151,14 +151,14 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
             <div className="flex items-center justify-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                분석 일시: {new Date().toLocaleDateString('ko-KR')}
+                Analysis Date: {new Date().toLocaleDateString('en-US')}
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                {new Date().toLocaleTimeString('ko-KR')}
+                {new Date().toLocaleTimeString('en-US')}
               </div>
             </div>
-            <p className="text-xs">Is This Phish? - AI 기반 피싱 탐지 서비스</p>
+            <p className="text-xs">Is This Phish? - AI-Powered Phishing Detection Service</p>
           </div>
         </CardContent>
       </Card>
@@ -173,10 +173,10 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
               size="lg"
             >
               <Download className="w-4 h-4" />
-              이미지로 저장하기
+              Save as Image
             </Button>
             <CardDescription>
-              분석 결과를 이미지로 저장하여 팀원들과 공유할 수 있습니다
+              Save the analysis result as an image to share with team members
             </CardDescription>
           </div>
         </CardContent>

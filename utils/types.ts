@@ -1,4 +1,4 @@
-export type PhishingScore = '안전' | '낮음' | '보통' | '위험' | '매우위험'
+export type PhishingScore = 'Safe' | 'Low' | 'Medium' | 'High' | 'Critical'
 export type PhishingScoreEn = 'SAFE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 
 export interface PhishingHighlight {

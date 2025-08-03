@@ -10,35 +10,35 @@ interface PhishingBadgeProps {
 }
 
 const SCORE_CONFIG = {
-  매우위험: { 
-    label: '매우위험', 
+  Critical: { 
+    label: 'Critical', 
     variant: 'phishingA' as const,
     icon: ShieldAlert,
-    description: '확실한 피싱으로 판단됨'
+    description: 'Confirmed phishing detected'
   },
-  위험: { 
-    label: '위험', 
+  High: { 
+    label: 'High', 
     variant: 'phishingB' as const,
     icon: ShieldAlert,
-    description: '피싱 가능성이 높음'
+    description: 'High phishing possibility'
   },
-  보통: { 
-    label: '보통', 
+  Medium: { 
+    label: 'Medium', 
     variant: 'phishingC' as const,
     icon: AlertTriangle,
-    description: '약간의 위험 요소'
+    description: 'Some risk factors present'
   },
-  낮음: { 
-    label: '낮음', 
+  Low: { 
+    label: 'Low', 
     variant: 'phishingD' as const,
     icon: Info,
-    description: '경미한 주의사항'
+    description: 'Minor concerns'
   },
-  안전: { 
-    label: '안전', 
+  Safe: { 
+    label: 'Safe', 
     variant: 'phishingF' as const,
     icon: ShieldCheck,
-    description: '정상적인 이메일/URL'
+    description: 'Normal email/URL'
   },
 }
 

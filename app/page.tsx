@@ -16,10 +16,10 @@ export default function Home() {
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center gap-3">
               <Zap className="w-8 h-8 text-primary" />
-              서비스 특징
+              Service Features
             </CardTitle>
             <CardDescription className="text-lg">
-              최첨단 AI와 전문가 규칙을 결합한 피싱 탐지 기술
+              Cutting-edge phishing detection technology combining AI and expert rules
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -28,36 +28,36 @@ export default function Home() {
                 <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto">
                   <Bot className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">AI 기반 분석</h3>
+                <h3 className="text-xl font-semibold">AI-Powered Analysis</h3>
                 <p className="text-muted-foreground">
-                  OpenAI GPT-4o를 활용한 고도화된 언어 모델로 
-                  피싱 패턴을 정확하게 탐지합니다.
+                  Advanced language models powered by OpenAI GPT-4o
+                  accurately detect phishing patterns.
                 </p>
-                <Badge variant="secondary">99.8% 정확도</Badge>
+                <Badge variant="secondary">99.8% Accuracy</Badge>
               </div>
               
               <div className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border">
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
                   <Zap className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">실시간 분석</h3>
+                <h3 className="text-xl font-semibold">Real-time Analysis</h3>
                 <p className="text-muted-foreground">
-                  3초 이내 분석 완료로 빠른 의사결정을 
-                  지원하며 의심 구간을 시각적으로 표시합니다.
+                  Analysis completed within 3 seconds to support
+                  fast decision-making with visual highlighting of suspicious areas.
                 </p>
-                                 <Badge variant="secondary">3초 이내</Badge>
+                <Badge variant="secondary">Under 3 seconds</Badge>
               </div>
               
               <div className="text-center space-y-4 p-6 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50 border">
                 <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">정적 규칙 결합</h3>
+                <h3 className="text-xl font-semibold">Combined Static Rules</h3>
                 <p className="text-muted-foreground">
-                  AI 분석과 함께 정적 보안 규칙을 적용하여
-                  더욱 정확한 위험도 평가를 제공합니다.
+                  Static security rules applied alongside AI analysis
+                  provide more accurate risk assessment.
                 </p>
-                <Badge variant="secondary">7개 규칙</Badge>
+                <Badge variant="secondary">7 Rules</Badge>
               </div>
             </div>
           </CardContent>
@@ -70,10 +70,10 @@ export default function Home() {
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center gap-3">
               <FileText className="w-8 h-8 text-primary" />
-              사용법
+              How to Use
             </CardTitle>
             <CardDescription className="text-lg">
-              간단한 4단계로 피싱 위험도를 확인하세요
+              Check phishing risk in 4 simple steps
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -83,9 +83,9 @@ export default function Home() {
                   1
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold">분석 타입 선택</h3>
+                  <h3 className="font-semibold">Select Analysis Type</h3>
                   <p className="text-sm text-muted-foreground">
-                    이메일 원문 분석 또는 URL 분석 중 선택하세요.
+                    Choose between email content analysis or URL analysis.
                   </p>
                 </div>
               </div>
@@ -95,9 +95,9 @@ export default function Home() {
                   2
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold">내용 입력</h3>
+                  <h3 className="font-semibold">Enter Content</h3>
                   <p className="text-sm text-muted-foreground">
-                    의심스러운 이메일의 전체 내용이나 URL을 입력하세요.
+                    Enter the complete content of suspicious email or URL.
                   </p>
                 </div>
               </div>
@@ -107,9 +107,9 @@ export default function Home() {
                   3
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold">분석 실행</h3>
+                  <h3 className="font-semibold">Run Analysis</h3>
                   <p className="text-sm text-muted-foreground">
-                    피싱 분석 시작 버튼을 클릭하여 AI 분석을 시작하세요.
+                    Click the Start Analysis button to begin AI analysis.
                   </p>
                 </div>
               </div>
@@ -119,9 +119,9 @@ export default function Home() {
                   4
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold">결과 확인 및 공유</h3>
+                  <h3 className="font-semibold">Review Results & Share</h3>
                   <p className="text-sm text-muted-foreground">
-                    A~F 등급으로 위험도를 확인하고, 이미지로 저장하여 공유하세요.
+                    Check risk level graded A-F and save as image to share.
                   </p>
                 </div>
               </div>
@@ -136,10 +136,10 @@ export default function Home() {
           <CardHeader className="text-center">
             <CardTitle className="text-3xl flex items-center justify-center gap-3">
               <CheckCircle className="w-8 h-8 text-primary" />
-              위험도 등급
+              Risk Levels
             </CardTitle>
             <CardDescription className="text-lg">
-              A~F 등급으로 피싱 위험도를 직관적으로 표시합니다
+              Phishing risk levels are intuitively displayed with A-F grades
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -148,8 +148,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-red-500 text-white text-lg px-3 py-1">A</Badge>
                   <div>
-                    <div className="font-semibold text-red-800">매우 위험</div>
-                    <div className="text-red-600 text-sm">확실한 피싱으로 판단됨</div>
+                    <div className="font-semibold text-red-800">Critical</div>
+                    <div className="text-red-600 text-sm">Confirmed phishing detected</div>
                   </div>
                 </CardContent>
               </Card>
@@ -158,8 +158,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-orange-500 text-white text-lg px-3 py-1">B</Badge>
                   <div>
-                    <div className="font-semibold text-orange-800">위험</div>
-                    <div className="text-orange-600 text-sm">피싱 가능성이 높음</div>
+                    <div className="font-semibold text-orange-800">High</div>
+                    <div className="text-orange-600 text-sm">High phishing possibility</div>
                   </div>
                 </CardContent>
               </Card>
@@ -168,8 +168,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-yellow-500 text-white text-lg px-3 py-1">C</Badge>
                   <div>
-                    <div className="font-semibold text-yellow-800">주의</div>
-                    <div className="text-yellow-600 text-sm">의심스러운 요소가 있음</div>
+                    <div className="font-semibold text-yellow-800">Medium</div>
+                    <div className="text-yellow-600 text-sm">Some suspicious elements present</div>
                   </div>
                 </CardContent>
               </Card>
@@ -178,8 +178,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-green-500 text-white text-lg px-3 py-1">D</Badge>
                   <div>
-                    <div className="font-semibold text-green-800">보통</div>
-                    <div className="text-green-600 text-sm">약간의 위험 요소</div>
+                    <div className="font-semibold text-green-800">Low</div>
+                    <div className="text-green-600 text-sm">Minor risk factors</div>
                   </div>
                 </CardContent>
               </Card>
@@ -188,8 +188,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-cyan-500 text-white text-lg px-3 py-1">E</Badge>
                   <div>
-                    <div className="font-semibold text-cyan-800">낮음</div>
-                    <div className="text-cyan-600 text-sm">경미한 주의사항</div>
+                    <div className="font-semibold text-cyan-800">Low</div>
+                    <div className="text-cyan-600 text-sm">Minor concerns</div>
                   </div>
                 </CardContent>
               </Card>
@@ -198,8 +198,8 @@ export default function Home() {
                 <CardContent className="flex items-center gap-4 pt-6">
                   <Badge className="bg-blue-500 text-white text-lg px-3 py-1">F</Badge>
                   <div>
-                    <div className="font-semibold text-blue-800">안전</div>
-                    <div className="text-blue-600 text-sm">정상적인 이메일/URL</div>
+                    <div className="font-semibold text-blue-800">Safe</div>
+                    <div className="text-blue-600 text-sm">Normal email/URL</div>
                   </div>
                 </CardContent>
               </Card>

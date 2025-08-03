@@ -9,17 +9,17 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Is This Phish? - AI 기반 피싱 탐지 서비스',
-  description: '이메일과 URL을 분석하여 피싱 위험도를 실시간으로 평가하는 AI 서비스입니다. OpenAI GPT-4o와 정적 규칙을 결합하여 정확한 분석을 제공합니다.',
-  keywords: ['피싱', '보안', 'AI', '이메일 보안', 'URL 검사', '사이버 보안'],
+  title: 'Is This Phish? - AI-Powered Phishing Detection Service',
+  description: 'An AI service that analyzes emails and URLs to assess phishing risk in real-time. Provides accurate analysis by combining OpenAI GPT-4o with static rules.',
+  keywords: ['phishing', 'security', 'AI', 'email security', 'URL analysis', 'cybersecurity'],
   authors: [{ name: 'Is This Phish Team' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
-    title: 'Is This Phish? - AI 기반 피싱 탐지 서비스',
-    description: 'AI와 정적 규칙을 활용한 실시간 피싱 탐지 서비스',
+    title: 'Is This Phish? - AI-Powered Phishing Detection Service',
+    description: 'Real-time phishing detection service using AI and static rules',
     type: 'website',
-    locale: 'ko_KR',
+    locale: 'en_US',
   },
 }
 
