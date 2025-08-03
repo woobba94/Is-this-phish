@@ -156,9 +156,9 @@ export default function Home() {
                     className={`border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
                   >
                     <CardContent className="flex items-center gap-4 pt-6">
-                      <Badge className={`bg-${config.color}-500 text-white text-lg px-4 py-2 font-bold`}>
+                      <div className={`${config.badgeClass} rounded-lg flex-shrink-0`}>
                         {level}
-                      </Badge>
+                      </div>
                       <div>
                         <div className={`font-semibold ${config.textColor}`}>
                           {config.label} Risk
