@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 import { applyStaticRules, getPhishingScore } from '@/utils/staticRules'
 import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore, PhishingScoreEn } from '@/utils/types'
+import { getCachedResult, setCachedResult, isValidUrl } from '@/utils/urlCache'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -75,6 +76,30 @@ export async function POST(request: NextRequest) {
         { success: false, error: '입력 크기가 20KB를 초과했습니다.' },
         { status: 400 }
       )
+    }
+
+    // URL인 경우 캐시 확인
+    const isUrl = body.type === 'url' && isValidUrl(body.content)
+    if (isUrl) {
+      try {
+        const cachedResult = await getCachedResult(body.content)
+        if (cachedResult) {
+          return NextResponse.json(
+            { success: true, result: cachedResult, cached: true },
+            {
+              headers: {
+                'X-RateLimit-Remaining': rateLimitInfo.remaining.toString(),
+                'X-RateLimit-Reset': rateLimitInfo.resetTime.toString(),
+                'X-Cache': 'HIT',
+                'X-Cache-Source': 'supabase'
+              }
+            }
+          )
+        }
+      } catch (error) {
+        console.error('Cache check failed:', error)
+        // 캐시 실패 시 계속 진행 (AI 분석으로)
+      }
     }
 
     // 정적 규칙 적용
@@ -187,12 +212,24 @@ Scoring:
         `\n\n정적 규칙에서 ${staticHighlights.length}개의 추가 위험 요소를 발견했습니다.` : '')
     }
 
+    // URL인 경우 결과를 캐시에 저장
+    if (isUrl) {
+      try {
+        await setCachedResult(body.content, result)
+      } catch (error) {
+        console.error('Cache storage failed:', error)
+        // 캐시 저장 실패는 무시하고 계속 진행
+      }
+    }
+
     return NextResponse.json(
-      { success: true, result },
+      { success: true, result, cached: false },
       {
         headers: {
           'X-RateLimit-Remaining': rateLimitInfo.remaining.toString(),
           'X-RateLimit-Reset': rateLimitInfo.resetTime.toString(),
+          'X-Cache': 'MISS',
+          'X-Cache-Source': isUrl ? 'ai-analysis' : 'email-analysis'
         }
       }
     )
