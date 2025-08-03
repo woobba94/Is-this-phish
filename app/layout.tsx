@@ -71,13 +71,12 @@ export default function RootLayout({
               <section className="space-y-4" aria-labelledby="stats-heading">
                 <h3 id="stats-heading" className="font-semibold flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" aria-hidden="true" />
-                  Service Statistics
+                  Global Threat Statistics
                 </h3>
                 <ul className="text-muted-foreground text-sm space-y-2">
-                  <li>• 61% increase in phishing reports in Korea in 2024</li>
+                  <li>• 40% increase in global phishing attacks in 2024</li>
+                  <li>• 3.4 billion phishing emails sent daily worldwide</li>
                   <li>• Real-time AI analysis with results in 3 seconds</li>
-                  <li>• Up to 10 free analyses per IP address daily</li>
-                  <li>• Powered by OpenAI GPT-4o analysis engine</li>
                 </ul>
               </section>
               
