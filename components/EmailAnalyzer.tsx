@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -28,23 +28,16 @@ const detectInputType = (content: string): 'email' | 'url' => {
 
 // Input configuration
 const INPUT_CONFIG = {
-  email: {
-    placeholder: `Please paste the complete email content...
+  placeholder: `Paste email content or enter URL here...
 
-Example:
+Email Example:
 From: sender@example.com
 Subject: Urgent - Account Verification Required
+Hello. Please verify your account immediately...
 
-Hello. Please verify your account immediately for security...`,
-    fieldLabel: 'Email Content (HTML/Plain Text)'
-  },
-  url: {
-    placeholder: `Please enter the URL...
-
-Example:
+URL Example:
 https://suspicious-site.com/login?user=...`,
-    fieldLabel: 'Suspicious URL'
-  }
+  fieldLabel: 'Content to Analyze (Email/URL Auto-Detected)'
 } as const
 
 export default function EmailAnalyzer() {
@@ -53,19 +46,15 @@ export default function EmailAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalyzeResponse | null>(null)
 
-  // 내용이 변경될 때 자동으로 타입 감지
-  useEffect(() => {
-    if (content.trim()) {
-      const detectedType = detectInputType(content)
-      setInputType(detectedType)
-    }
-  }, [content])
-
   const handleAnalyze = async () => {
     if (!content.trim()) {
       alert('Please enter content to analyze.')
       return
     }
+
+    // Start Analysis 버튼을 눌렀을 때 타입 감지
+    const detectedType = detectInputType(content.trim())
+    setInputType(detectedType)
 
     setIsAnalyzing(true)
     setResult(null)
@@ -73,7 +62,7 @@ export default function EmailAnalyzer() {
     try {
       const request: AnalyzeRequest = {
         content: content.trim(),
-        type: inputType,
+        type: detectedType,
       }
 
       const response = await fetch('/api/analyze', {
@@ -104,9 +93,9 @@ export default function EmailAnalyzer() {
   const handleClear = () => {
     setContent('')
     setResult(null)
+    setInputType('email') // 초기 타입으로 리셋
   }
 
-  const currentConfig = INPUT_CONFIG[inputType]
   const isContentValid = content.trim().length > 0
   const isNearSizeLimit = content.length > API_CONFIG.MAX_CONTENT_SIZE * 0.75
 
@@ -137,10 +126,10 @@ export default function EmailAnalyzer() {
             </CardTitle>
             <CardDescription className="text-lg mt-2">
               Analyze suspicious emails or URLs to assess risk levels
-              {content.trim() && (
+              {result?.success && (
                 <span className="block mt-2 text-sm">
                   <Badge variant="outline" className="mr-2">
-                    Auto-detected: {inputType === 'email' ? 'Email' : 'URL'}
+                    Detected: {inputType === 'email' ? 'Email' : 'URL'}
                   </Badge>
                 </span>
               )}
@@ -151,7 +140,7 @@ export default function EmailAnalyzer() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <label htmlFor="content-input" className="text-lg font-medium">
-                  {currentConfig.fieldLabel}
+                  {INPUT_CONFIG.fieldLabel}
                 </label>
                 <Badge variant="outline" className="text-sm">
                   Max {API_CONFIG.MAX_CONTENT_SIZE / 1024}KB
@@ -161,7 +150,7 @@ export default function EmailAnalyzer() {
                 id="content-input"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder={currentConfig.placeholder}
+                placeholder={INPUT_CONFIG.placeholder}
                 className="min-h-[250px] resize-none text-base p-4"
                 maxLength={API_CONFIG.MAX_CONTENT_SIZE}
                 aria-describedby="content-help content-count"
