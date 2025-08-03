@@ -73,7 +73,7 @@ describe('staticRules', () => {
   })
 
   describe('getPhishingScore', () => {
-    it('위험 요소가 많으면 A 등급을 반환해야 함', () => {
+    it('위험 요소가 많으면 매우위험 등급을 반환해야 함', () => {
       const highlights = [
         { text: 'test1', reason: '한국 도메인에서 발신했으나 해외 도메인으로 연결' },
         { text: 'test2', reason: 'HTML 폼이 해외 도메인으로 전송' },
@@ -81,33 +81,33 @@ describe('staticRules', () => {
       ]
       
       const score = getPhishingScore(highlights)
-      expect(score).toBe('A')
+      expect(score).toBe('매우위험')
     })
 
-    it('중간 정도 위험 요소가 있으면 B-C 등급을 반환해야 함', () => {
+    it('중간 정도 위험 요소가 있으면 위험-보통 등급을 반환해야 함', () => {
       const highlights = [
         { text: 'test1', reason: '한국 도메인에서 발신했으나 해외 도메인으로 연결' },
         { text: 'test2', reason: '퍼블릭 이메일에서 공식 업무 메일로 가장' },
       ]
       
       const score = getPhishingScore(highlights)
-      expect(['B', 'C']).toContain(score)
+      expect(['위험', '보통']).toContain(score)
     })
 
-    it('위험 요소가 적으면 D-E 등급을 반환해야 함', () => {
+    it('위험 요소가 적으면 낮음 등급을 반환해야 함', () => {
       const highlights = [
         { text: 'test1', reason: '퍼블릭 이메일에서 공식 업무 메일로 가장' },
       ]
       
       const score = getPhishingScore(highlights)
-      expect(['D', 'E']).toContain(score)
+      expect(score).toBe('낮음')
     })
 
-    it('위험 요소가 없으면 F 등급을 반환해야 함', () => {
+    it('위험 요소가 없으면 안전 등급을 반환해야 함', () => {
       const highlights: any[] = []
       
       const score = getPhishingScore(highlights)
-      expect(score).toBe('F')
+      expect(score).toBe('안전')
     })
   })
 }) 

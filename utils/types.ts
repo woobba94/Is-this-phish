@@ -1,4 +1,4 @@
-export type PhishingScore = 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+export type PhishingScore = '안전' | '낮음' | '보통' | '위험' | '매우위험'
 
 export interface PhishingHighlight {
   text: string

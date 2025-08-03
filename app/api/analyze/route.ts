@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { checkRateLimit, getRealIP } from '@/utils/rateLimit'
 import { applyStaticRules, getPhishingScore } from '@/utils/staticRules'
-import { AnalyzeRequest, AnalysisResult, PhishingHighlight } from '@/utils/types'
+import { AnalyzeRequest, AnalysisResult, PhishingHighlight, PhishingScore } from '@/utils/types'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -79,12 +79,11 @@ export async function POST(request: NextRequest) {
 6. 사회공학적 기법 사용
 
 점수 기준:
-- A: 매우 위험 (확실한 피싱)
-- B: 위험 (피싱 가능성 높음)
-- C: 주의 (의심스러운 요소 있음)
-- D: 보통 (약간의 위험 요소)
-- E: 낮음 (경미한 주의사항)
-- F: 안전 (정상적인 이메일/URL)`
+- 매우위험: 확실한 피싱
+- 위험: 피싱 가능성 높음
+- 보통: 약간의 위험 요소
+- 낮음: 경미한 주의사항
+- 안전: 정상적인 이메일/URL`
         },
         {
           role: 'user',
@@ -100,7 +99,7 @@ export async function POST(request: NextRequest) {
             properties: {
               score: {
                 type: 'string',
-                enum: ['A', 'B', 'C', 'D', 'E', 'F'],
+                enum: ['안전', '낮음', '보통', '위험', '매우위험'],
                 description: '피싱 위험도 점수'
               },
               highlights: {
@@ -156,7 +155,10 @@ export async function POST(request: NextRequest) {
 
     // 최종 점수 계산 (정적 규칙과 AI 결과 중 더 높은 위험도 선택)
     const staticScore = getPhishingScore(staticHighlights)
-    const finalScore = [aiResult.score, staticScore].sort()[0] // 알파벳 순으로 정렬하면 더 위험한 점수가 앞에 옴
+    const scoreOrder = ['안전', '낮음', '보통', '위험', '매우위험']
+    const aiScoreLevel = scoreOrder.indexOf(aiResult.score)
+    const staticScoreLevel = scoreOrder.indexOf(staticScore)
+    const finalScore = scoreOrder[Math.max(aiScoreLevel, staticScoreLevel)] as PhishingScore
 
     const result: AnalysisResult = {
       score: finalScore,

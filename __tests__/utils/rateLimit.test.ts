@@ -18,14 +18,20 @@ describe('rateLimit utils', () => {
       const result = checkRateLimit('192.168.1.1')
       
       expect(result.allowed).toBe(true)
-      expect(result.remaining).toBe(0) // 프로덕션에서는 1회 제한
+      expect(result.remaining).toBe(9) // 프로덕션에서는 10회 제한
       expect(result.resetTime).toBeGreaterThan(Date.now())
     })
 
-    it('프로덕션 환경에서 두 번째 요청은 거부되어야 함', () => {
+    it('프로덕션 환경에서 11번째 요청은 거부되어야 함', () => {
       vi.stubEnv('NODE_ENV', 'production')
-      checkRateLimit('192.168.1.2') // 첫 번째 요청 (다른 IP 사용)
-      const result = checkRateLimit('192.168.1.2') // 두 번째 요청
+      
+      // 10번 요청 후 11번째에서 거부되는지 확인
+      const ip = '192.168.1.2'
+      for (let i = 0; i < 10; i++) {
+        checkRateLimit(ip)
+      }
+      
+      const result = checkRateLimit(ip) // 11번째 요청
       
       expect(result.allowed).toBe(false)
       expect(result.remaining).toBe(0)
@@ -41,17 +47,17 @@ describe('rateLimit utils', () => {
       expect(result.remaining).toBe(49) // 개발환경에서는 50회 제한
     })
 
-    it('개발 환경이어도 로컬 IP가 아니면 프로덕션 제한 적용', () => {
+    it('개발 환경에서는 IP와 상관없이 50회 제한 적용', () => {
       vi.stubEnv('NODE_ENV', 'development')
       vi.stubEnv('ALLOW_DEV_MODE', 'true')
       
       const result = checkRateLimit('192.168.1.3')
       
       expect(result.allowed).toBe(true)
-      expect(result.remaining).toBe(0) // 로컬 IP가 아니므로 1회 제한
+      expect(result.remaining).toBe(49) // 개발 환경이므로 50회 제한
     })
 
-    it('ALLOW_DEV_MODE가 false면 개발환경에서도 프로덕션 제한 적용', () => {
+    it('NODE_ENV가 development여도 개발 모드가 활성화됨', () => {
       vi.stubEnv('NODE_ENV', 'development')
       vi.stubEnv('ALLOW_DEV_MODE', 'false')
       
@@ -59,7 +65,7 @@ describe('rateLimit utils', () => {
       const result = checkRateLimit('127.0.0.2')
       
       expect(result.allowed).toBe(true)
-      expect(result.remaining).toBe(0) // DEV_MODE가 비활성화되어 1회 제한
+      expect(result.remaining).toBe(49) // NODE_ENV=development이므로 50회 제한
     })
 
     it('다른 IP는 독립적으로 처리되어야 함', () => {
@@ -68,7 +74,7 @@ describe('rateLimit utils', () => {
       const result = checkRateLimit('192.168.1.5') // 다른 IP에서 요청
       
       expect(result.allowed).toBe(true)
-      expect(result.remaining).toBe(0)
+      expect(result.remaining).toBe(9)
     })
 
     it('rate limit 정보가 올바르게 반환되어야 함', () => {

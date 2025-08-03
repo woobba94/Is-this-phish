@@ -69,7 +69,7 @@ export function applyStaticRules(content: string): PhishingHighlight[] {
   return highlights
 }
 
-export function getPhishingScore(highlights: PhishingHighlight[]): 'A' | 'B' | 'C' | 'D' | 'E' | 'F' {
+export function getPhishingScore(highlights: PhishingHighlight[]): '안전' | '낮음' | '보통' | '위험' | '매우위험' {
   const highCount = highlights.filter(h => 
     STATIC_RULES.find(r => r.reason === h.reason)?.severity === 'high'
   ).length
@@ -80,10 +80,10 @@ export function getPhishingScore(highlights: PhishingHighlight[]): 'A' | 'B' | '
   
   const totalScore = highCount * 3 + mediumCount * 1
   
-  if (totalScore >= 9) return 'A' // 매우 위험
-  if (totalScore >= 6) return 'B' // 위험
-  if (totalScore >= 4) return 'C' // 주의
-  if (totalScore >= 2) return 'D' // 보통
-  if (totalScore >= 1) return 'E' // 낮음
-  return 'F' // 안전
+  if (totalScore >= 9) return '매우위험' // 확실한 피싱
+  if (totalScore >= 6) return '위험' // 피싱 가능성 높음
+  if (totalScore >= 4) return '보통' // 약간의 위험 요소
+  if (totalScore >= 2) return '낮음' // 경미한 주의사항
+  if (totalScore >= 1) return '낮음' // 경미한 주의사항
+  return '안전' // 정상적인 이메일/URL
 } 

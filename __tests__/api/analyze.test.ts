@@ -66,7 +66,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('F')
+    ;(getPhishingScore as any).mockReturnValue('안전')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -74,7 +74,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: 'F',
+              score: '안전',
               highlights: [],
               summary: 'This content appears to be safe.'
             })
@@ -88,7 +88,7 @@ describe('/api/analyze', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.result.score).toBe('F')
+    expect(data.result.score).toBe('안전')
   })
 
   it('rate limit 초과 시 429 에러를 반환해야 함', async () => {
@@ -116,7 +116,7 @@ describe('/api/analyze', () => {
 
     expect(response.status).toBe(429)
     expect(data.success).toBe(false)
-    expect(data.error).toContain('일일 요청 한도를 초과했습니다')
+    expect(data.error).toContain('일일 요청 한도(10회)를 초과했습니다')
   })
 
   it('빈 내용 요청 시 400 에러를 반환해야 함', async () => {
@@ -198,7 +198,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('F')
+    ;(getPhishingScore as any).mockReturnValue('안전')
 
     // OpenAI mock - 에러 발생
     mockCreate.mockRejectedValue(new Error('OpenAI API Error'))
@@ -236,7 +236,7 @@ describe('/api/analyze', () => {
     ;(applyStaticRules as any).mockReturnValue([
       { text: 'bit.ly/test', reason: '단축 URL 사용' }
     ])
-    ;(getPhishingScore as any).mockReturnValue('C')
+    ;(getPhishingScore as any).mockReturnValue('보통')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -244,7 +244,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: 'D',
+              score: '낮음',
               highlights: [
                 { text: 'suspicious', reason: 'AI detected suspicious content' }
               ],
@@ -260,7 +260,7 @@ describe('/api/analyze', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.result.score).toBe('C') // 더 위험한 점수 선택
+    expect(data.result.score).toBe('보통') // 더 위험한 점수 선택
     expect(data.result.highlights).toHaveLength(2) // 정적 규칙 + AI 결과
   })
 
@@ -287,7 +287,7 @@ describe('/api/analyze', () => {
     // Static rules mock
     const { applyStaticRules, getPhishingScore } = await import('@/utils/staticRules')
     ;(applyStaticRules as any).mockReturnValue([])
-    ;(getPhishingScore as any).mockReturnValue('F')
+    ;(getPhishingScore as any).mockReturnValue('안전')
 
     // OpenAI mock
     mockCreate.mockResolvedValue({
@@ -295,7 +295,7 @@ describe('/api/analyze', () => {
         message: {
           function_call: {
             arguments: JSON.stringify({
-              score: 'F',
+              score: '안전',
               highlights: [],
               summary: 'Safe content'
             })
