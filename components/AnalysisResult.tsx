@@ -3,8 +3,14 @@
 import { useRef } from 'react'
 import dynamic from 'next/dynamic'
 import html2canvas from 'html2canvas'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 import PhishingBadge from './PhishingBadge'
 import { AnalysisResult as AnalysisResultType } from '@/utils/types'
+import { Download, Calendar, Clock, AlertTriangle, FileText, Shield } from 'lucide-react'
 
 // react-quill을 dynamic import로 로드 (SSR 방지)
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -25,7 +31,7 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
     result.highlights.forEach((highlight, index) => {
       const escapedText = highlight.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const regex = new RegExp(escapedText, 'gi')
-      const backgroundColor = `bg-red-200 border border-red-400 rounded px-1 py-0.5`
+      const backgroundColor = `bg-destructive/20 border border-destructive/40 rounded px-1 py-0.5`
       
       highlightedContent = highlightedContent.replace(
         regex,
@@ -67,70 +73,114 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
 
   return (
     <div className="space-y-6">
-      <div ref={resultRef} className="bg-white p-6 rounded-lg shadow-lg border">
+      <Card ref={resultRef} className="shadow-lg border-2">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">피싱 분석 결과</h2>
-          <PhishingBadge score={result.score} />
-        </div>
-
-        {/* 분석 요약 */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">분석 요약</h3>
-          <p className="text-gray-600 leading-relaxed">{result.summary}</p>
-        </div>
-
-        {/* 하이라이트된 컨텐츠 */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
-            원본 내용 (의심 구간 강조)
-          </h3>
-          <div className="border rounded-lg p-4 bg-gray-50 max-h-96 overflow-y-auto">
-            <ReactQuill
-              value={getHighlightedContent()}
-              readOnly={true}
-              theme="bubble"
-              modules={{ toolbar: false }}
-            />
+        <CardHeader className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <Shield className="w-8 h-8 text-primary" />
+            <CardTitle className="text-3xl">피싱 분석 결과</CardTitle>
           </div>
-        </div>
+          <div className="flex justify-center">
+            <PhishingBadge score={result.score} />
+          </div>
+        </CardHeader>
 
-        {/* 발견된 위험 요소 */}
-        {result.highlights.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-3">
-              발견된 위험 요소 ({result.highlights.length}개)
+        <CardContent className="space-y-8">
+          {/* 분석 요약 */}
+          <div className="space-y-3">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              분석 요약
             </h3>
-            <div className="space-y-3">
-              {result.highlights.map((highlight, index) => (
-                <div key={index} className="border-l-4 border-red-400 bg-red-50 p-3 rounded-r">
-                  <div className="font-medium text-red-800 mb-1">"{highlight.text}"</div>
-                  <div className="text-red-600 text-sm">{highlight.reason}</div>
-                </div>
-              ))}
-            </div>
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6">
+                <p className="text-foreground leading-relaxed">{result.summary}</p>
+              </CardContent>
+            </Card>
           </div>
-        )}
 
-        {/* 푸터 정보 */}
-        <div className="text-center text-sm text-gray-500 border-t pt-4">
-          <p>Is This Phish? - AI 기반 피싱 탐지 서비스</p>
-          <p>분석 시간: {new Date().toLocaleString('ko-KR')}</p>
-        </div>
-      </div>
+          <Separator />
+
+          {/* 하이라이트된 컨텐츠 */}
+          <div className="space-y-3">
+            <h3 className="text-xl font-semibold">
+              원본 내용 (의심 구간 강조)
+            </h3>
+            <Card>
+              <CardContent className="p-0">
+                <div className="border rounded-lg p-4 bg-background max-h-96 overflow-y-auto custom-scrollbar">
+                  <ReactQuill
+                    value={getHighlightedContent()}
+                    readOnly={true}
+                    theme="bubble"
+                    modules={{ toolbar: false }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 발견된 위험 요소 */}
+          {result.highlights.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
+                발견된 위험 요소
+                <Badge variant="destructive" className="ml-2">
+                  {result.highlights.length}개
+                </Badge>
+              </h3>
+              <div className="grid gap-3">
+                {result.highlights.map((highlight, index) => (
+                  <Alert key={index} variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription className="space-y-1">
+                      <div className="font-medium">"{highlight.text}"</div>
+                      <div className="text-sm opacity-90">{highlight.reason}</div>
+                    </AlertDescription>
+                  </Alert>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          {/* 푸터 정보 */}
+          <div className="text-center space-y-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                분석 일시: {new Date().toLocaleDateString('ko-KR')}
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {new Date().toLocaleTimeString('ko-KR')}
+              </div>
+            </div>
+            <p className="text-xs">Is This Phish? - AI 기반 피싱 탐지 서비스</p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* 공유 버튼 */}
-      <div className="text-center">
-        <button
-          onClick={handleShareAsImage}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md"
-        >
-          📸 이미지로 저장하기
-        </button>
-        <p className="text-sm text-gray-500 mt-2">
-          분석 결과를 이미지로 저장하여 공유할 수 있습니다
-        </p>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <Button
+              onClick={handleShareAsImage}
+              className="gap-2"
+              size="lg"
+            >
+              <Download className="w-4 h-4" />
+              이미지로 저장하기
+            </Button>
+            <CardDescription>
+              분석 결과를 이미지로 저장하여 팀원들과 공유할 수 있습니다
+            </CardDescription>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 } 
