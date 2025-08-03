@@ -99,7 +99,7 @@ describe('rateLimit', () => {
         headers: {
           get: () => null
         }
-      } as Request
+      } as unknown as Request
       
       const ip = getRealIP(mockRequest)
       expect(ip).toBe('127.0.0.1')
