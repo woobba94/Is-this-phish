@@ -1,13 +1,14 @@
-import crypto from 'crypto'
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
 import { AnalysisResult } from './types'
 
-// URL을 SHA-256으로 해시화 (프라이버시 보호)
-export function hashUrl(url: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(url.toLowerCase().trim())
-    .digest('hex')
+// URL을 SHA-256으로 해시화 (프라이버시 보호) - Web Crypto API 사용
+export async function hashUrl(url: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(url.toLowerCase().trim())
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashHex
 }
 
 // URL에서 도메인 추출
@@ -28,7 +29,7 @@ export async function getCachedResult(url: string): Promise<AnalysisResult | nul
   }
 
   try {
-    const urlHash = hashUrl(url)
+    const urlHash = await hashUrl(url)
     
     const { data, error } = await supabaseAdmin
       .from('url_cache')
@@ -66,7 +67,7 @@ export async function setCachedResult(url: string, result: AnalysisResult): Prom
   }
 
   try {
-    const urlHash = hashUrl(url)
+    const urlHash = await hashUrl(url)
     const domain = extractDomain(url)
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7일 후 만료
     
