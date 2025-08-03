@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Shield, BarChart3, AlertTriangle } from 'lucide-react'
 import './globals.css'
 
@@ -45,7 +44,7 @@ export default function RootLayout({
         
         <footer className="bg-card border-t mt-16" role="contentinfo">
           <div className="container mx-auto px-4 py-12">
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {/* Brand section */}
               <section className="md:col-span-2 space-y-4" aria-labelledby="brand-heading">
                 <div className="flex items-center gap-3">
@@ -53,67 +52,12 @@ export default function RootLayout({
                   <h2 id="brand-heading" className="text-2xl font-bold">Is This Phish?</h2>
                 </div>
                 <p className="text-muted-foreground max-w-md">
-                  AI-powered real-time phishing detection service that combines AI and static rules 
-                  to accurately analyze security risks in emails and URLs.
-                </p>
-                <div className="flex gap-2" role="list" aria-label="Service highlights">
-                  <Badge variant="secondary" className="gap-1" role="listitem">
-                    <Shield className="w-3 h-3" aria-hidden="true" />
-                    AI-Powered Detection
-                  </Badge>
-                  <Badge variant="outline" className="gap-1" role="listitem">
-                    <span aria-hidden="true">⚡</span> 3-second Analysis
-                  </Badge>
-                </div>
-              </section>
-              
-              {/* Statistics section */}
-              <section className="space-y-4" aria-labelledby="stats-heading">
-                <h3 id="stats-heading" className="font-semibold flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" aria-hidden="true" />
-                  Global Threat Statistics
-                </h3>
-                <ul className="text-muted-foreground text-sm space-y-2">
-                  <li>• 40% increase in global phishing attacks in 2024</li>
-                  <li>• 3.4 billion phishing emails sent daily worldwide</li>
-                  <li>• Real-time AI analysis with results in 3 seconds</li>
-                </ul>
-              </section>
-              
-              {/* Security guidelines section */}
-              <section className="space-y-4" aria-labelledby="security-heading">
-                <h3 id="security-heading" className="font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-                  Security Guidelines
-                </h3>
-                <ul className="text-muted-foreground text-sm space-y-2">
-                  <li>• Never click suspicious links</li>
-                  <li>• Verify domains before entering personal information</li>
-                  <li>• Always verify attachments before opening</li>
-                  <li>• Use official channels for financial requests</li>
-                </ul>
-              </section>
-            </div>
-            
-            <Separator className="my-8" />
-            
-            {/* Bottom information */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-              <div className="flex items-center gap-4">
-                <p>&copy; 2024 Is This Phish. All rights reserved.</p>
-                <Badge variant="outline" className="text-xs">
-                  Made with Next.js 14 + OpenAI
-                </Badge>
-              </div>
-              <div className="flex items-center gap-4">
-                <p className="text-center">
                   Building a safer internet with AI-powered phishing detection.
                 </p>
-              </div>
-            </div>
-            
-            {/* Disclaimer */}
-            <Card className="mt-6 bg-muted/50" role="note" aria-labelledby="disclaimer-heading">
+              </section>
+              
+              {/* Disclaimer */}
+              <Card className="mt-6 bg-muted/50" role="note" aria-labelledby="disclaimer-heading">
               <CardContent className="pt-6">
                 <h4 id="disclaimer-heading" className="sr-only">Important Disclaimer</h4>
                 <p className="text-xs text-muted-foreground text-center">
@@ -122,6 +66,15 @@ export default function RootLayout({
                 </p>
               </CardContent>
             </Card>
+            </div>
+            
+            {/* Bottom information */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm mt-8">
+              <div className="flex items-center gap-4">
+                <p>&copy; 2024 Is This Phish. All rights reserved.</p>
+              </div>
+            </div>
+            
           </div>
         </footer>
       </body>

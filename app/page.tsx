@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { SectionComponent, SectionHeader, SectionTitle, SectionDescription, SectionContent } from '@/components/ui/section'
+import { ItemCard, ItemCardContent } from '@/components/ui/item-card'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import EmailAnalyzer from '@/components/EmailAnalyzer'
 import { RISK_LEVELS } from '@/utils/constants'
@@ -13,12 +14,13 @@ export default function Home() {
   
   return (
     <div className="min-h-screen">
-      <EmailAnalyzer />
-      
       {/* Service introduction sections */}
-      <div className="container mx-auto max-w-6xl p-4 space-y-12 mt-16" role="region" aria-labelledby="service-info">
+      <div className="container mx-auto max-w-6xl space-y-16 mt-16" role="region" aria-labelledby="service-info">
+        <section aria-labelledby="analyzer-section">
+          <EmailAnalyzer/>
+        </section>
+
         <h2 id="service-info" className="sr-only">Service Information</h2>
-        
         {/* Service features */}
         <section aria-labelledby="features-heading">
           <Card className="shadow-lg">
@@ -80,8 +82,6 @@ export default function Home() {
           </Card>
         </section>
 
-        <Separator role="separator" aria-label="Section divider" />
-        
         {/* How to use guide */}
         <section aria-labelledby="guide-heading">
           <Card className="shadow-lg">
@@ -148,31 +148,29 @@ export default function Home() {
           </Card>
         </section>
 
-        <Separator role="separator" aria-label="Section divider" />
-        
         {/* Risk levels explanation */}
         <section aria-labelledby="risk-levels-heading">
-          <Card className="shadow-lg">
-            <CardHeader className="text-center">
-              <CardTitle className="text-3xl flex items-center justify-center gap-3" id="risk-levels-heading">
+          <SectionComponent className="shadow-lg">
+            <SectionHeader className="text-center">
+              <SectionTitle className="text-3xl flex items-center justify-center gap-3" id="risk-levels-heading">
                 <CheckCircle className="w-8 h-8 text-primary" aria-hidden="true" />
                 Risk Levels
-              </CardTitle>
-              <CardDescription className="text-lg">
+              </SectionTitle>
+              <SectionDescription className="text-lg">
                 Phishing risk levels are clearly categorized into 5 levels
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </SectionDescription>
+            </SectionHeader>
+            <SectionContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Risk level definitions">
                 {riskLevelOrder.map((level, index) => {
                   const config = RISK_LEVELS[level]
                   return (
-                    <Card 
+                    <ItemCard 
                       key={level} 
-                      className={`h-full border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                      className={`border-l-4 ${config.borderColor} ${config.bgColor} ${level === 'Safe' ? 'md:col-span-2 lg:col-span-1' : ''}`}
                       role="listitem"
                     >
-                      <CardContent className="flex items-center gap-4 pt-6 h-full">
+                      <ItemCardContent className="flex items-center gap-4 h-full">
                         <div className={`${config.badgeClass} rounded-lg flex-shrink-0`} aria-hidden="true">
                           {level}
                         </div>
@@ -184,13 +182,13 @@ export default function Home() {
                             {config.description}
                           </p>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </ItemCardContent>
+                    </ItemCard>
                   )
                 })}
               </div>
-            </CardContent>
-          </Card>
+            </SectionContent>
+          </SectionComponent>
         </section>
       </div>
     </div>

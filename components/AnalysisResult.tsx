@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import PhishingBadge from './PhishingBadge'
 import { AnalysisResult as AnalysisResultType } from '@/utils/types'
 import { Download, Calendar, Clock, AlertTriangle, FileText, Shield } from 'lucide-react'
@@ -100,8 +99,6 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
             </Card>
           </section>
 
-          <Separator role="separator" aria-label="Content section divider" />
-
           {/* Highlighted content */}
           <section aria-labelledby="content-heading">
             <h2 id="content-heading" className="text-2xl font-semibold mb-4">
@@ -159,8 +156,6 @@ export default function AnalysisResult({ result, originalContent }: AnalysisResu
               </div>
             </section>
           )}
-
-          <Separator role="separator" aria-label="Footer section divider" />
 
           {/* Footer information */}
           <footer className="text-center space-y-3 text-muted-foreground" role="contentinfo">

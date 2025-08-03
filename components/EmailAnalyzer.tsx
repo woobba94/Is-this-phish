@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import AnalysisResult from './AnalysisResult'
 import { AnalyzeRequest, AnalyzeResponse } from '@/utils/types'
 import { API_CONFIG } from '@/utils/constants'
@@ -100,7 +99,7 @@ export default function EmailAnalyzer() {
   const isNearSizeLimit = content.length > API_CONFIG.MAX_CONTENT_SIZE * 0.75
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-8 p-6">
+    <div className="mx-auto max-w-6xl space-y-8">
       {/* Main header */}
       <header className="text-center space-y-4">
         <div className="flex items-center justify-center gap-4 mb-6">
@@ -114,28 +113,19 @@ export default function EmailAnalyzer() {
         </p>
       </header>
 
-      <Separator role="separator" aria-label="Header content divider" />
-
       {/* Analysis input form */}
       <section aria-labelledby="analysis-form-heading">
         <Card className="shadow-lg">
-          <CardHeader className="p-6">
+          <CardHeader>
             <CardTitle className="text-3xl flex items-center gap-3" id="analysis-form-heading">
               <Search className="w-8 h-8" aria-hidden="true" />
               Phishing Analysis
             </CardTitle>
             <CardDescription className="text-lg mt-2">
               Analyze suspicious emails or URLs to assess risk levels
-              {result?.success && (
-                <span className="block mt-2 text-sm">
-                  <Badge variant="outline" className="mr-2">
-                    Detected: {inputType === 'email' ? 'Email' : 'URL'}
-                  </Badge>
-                </span>
-              )}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 p-6">
+          <CardContent className="space-y-6">
             {/* Content input area */}
             <div className="space-y-3">
               <div className="flex items-center gap-3">
@@ -191,7 +181,7 @@ export default function EmailAnalyzer() {
               </Button>
               <Button
                 onClick={handleClear}
-                disabled={isAnalyzing}
+                disabled={isAnalyzing || !isContentValid}
                 variant="outline"
                 size="lg"
                 className="gap-3 text-lg px-8 py-4 h-auto"
@@ -208,8 +198,10 @@ export default function EmailAnalyzer() {
 
             {/* Important notes */}
             <Alert variant="warning" role="region" aria-labelledby="important-notes" className="p-6">
-              <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-              <AlertTitle id="important-notes" className="text-lg">Important Notes</AlertTitle>
+              <AlertTitle id="important-notes" className="text-lg flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+                Important Notes
+              </AlertTitle>
               <AlertDescription className="space-y-2 mt-3 text-base">
                 <ul className="list-disc list-inside space-y-2">
                   <li>10 analyses per IP address per day</li>
@@ -241,40 +233,6 @@ export default function EmailAnalyzer() {
           )}
         </section>
       )}
-
-      {/* Footer with Statistics */}
-      <footer className="border-t py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Global Phishing Statistics */}
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold text-foreground mb-4">Global Phishing Threat</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-red-600">3.4B</div>
-                <div className="text-base text-muted-foreground">phishing emails sent daily worldwide</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-orange-600">40%</div>
-                <div className="text-base text-muted-foreground">increase in global phishing attacks in 2024</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-yellow-600">83%</div>
-                <div className="text-base text-muted-foreground">of organizations experienced phishing attacks</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Separator */}
-          <Separator className="my-6" />
-          
-          {/* Powered By */}
-          <div className="text-center">
-            <Badge variant="secondary" className="text-base px-4 py-2">
-              🤖 Powered by OpenAI GPT-4o
-            </Badge>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 } 
