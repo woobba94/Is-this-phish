@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import EmailAnalyzer from '@/components/EmailAnalyzer'
-import { Bot, Zap, Shield, FileText, Search, CheckCircle, Camera } from 'lucide-react'
+import { Bot, Zap, Shield, FileText, CheckCircle } from 'lucide-react'
 
 export default function Home() {
   return (

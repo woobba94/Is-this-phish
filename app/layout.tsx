@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Shield, BarChart3, AlertTriangle, Github, Mail } from 'lucide-react'
+import { Shield, BarChart3, AlertTriangle } from 'lucide-react'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
